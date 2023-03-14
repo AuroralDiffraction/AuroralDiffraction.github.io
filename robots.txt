@@ -1,3 +1,0 @@
-User-agent: *
-Disallow:
-Sitemap: https://auroraldiffraction.github.io/sitemap.xml
