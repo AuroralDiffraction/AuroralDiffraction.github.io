@@ -11,7 +11,7 @@
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 14 Mar 2023 05:36:28 +0100</lastBuildDate><atom:link href="https://auroraldiffraction.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 14 Mar 2023 14:09:54 +0100</lastBuildDate><atom:link href="https://auroraldiffraction.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>About Me</title>
       <link>https://auroraldiffraction.github.io/post/about/</link>
@@ -22,11 +22,11 @@
     </item>
     
     <item>
-      <title>My 1st post</title>
-      <link>https://auroraldiffraction.github.io/home/</link>
-      <pubDate>Tue, 15 Sep 2020 11:30:03 +0000</pubDate>
+      <title>Blogtest</title>
+      <link>https://auroraldiffraction.github.io/blogs/blogtest/</link>
+      <pubDate>Tue, 14 Mar 2023 14:09:54 +0100</pubDate>
       
-      <guid>https://auroraldiffraction.github.io/home/</guid>
+      <guid>https://auroraldiffraction.github.io/blogs/blogtest/</guid>
       <description>Desc Text.</description>
     </item>
     
@@ -38,6 +38,7 @@
       <guid>https://auroraldiffraction.github.io/post/test/</guid>
       <description>Desc Text.</description>
     </item>
+    
     
     
   </channel>
