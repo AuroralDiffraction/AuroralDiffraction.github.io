@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Tags on Auroral Diffraction</title>
+    <link>https://auroraldiffraction.github.io/tags/</link>
+    <description>Recent content in Tags on Auroral Diffraction</description>
+    <image>
+      <title>Auroral Diffraction</title>
+      <url>https://auroraldiffraction.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://auroraldiffraction.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 14 Mar 2023 05:36:28 +0100</lastBuildDate><atom:link href="https://auroraldiffraction.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>About Me</title>
+      <link>https://auroraldiffraction.github.io/tags/about-me/</link>
+      <pubDate>Tue, 14 Mar 2023 05:36:28 +0100</pubDate>
+      
+      <guid>https://auroraldiffraction.github.io/tags/about-me/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>first</title>
+      <link>https://auroraldiffraction.github.io/tags/first/</link>
+      <pubDate>Tue, 15 Sep 2020 11:30:03 +0000</pubDate>
+      
+      <guid>https://auroraldiffraction.github.io/tags/first/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
