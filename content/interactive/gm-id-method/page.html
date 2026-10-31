@@ -1,0 +1,535 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The gm/ID Method</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single reading column (~68ch) on cool lab paper; charts and tools break out to a wider measure. Region colours borrow IC layout layers: diffusion green, amber, poly red. */
+:root{
+  --paper:#F1F4F4; --panel:#FFFFFF; --ink:#14202A; --muted:#566571; --rule:#D3DBDE; --grid:#E4E9EB;
+  --accent:#1C5DA6; --accent-soft:#DCE8F5;
+  --wi:#2A8656; --mi:#B98000; --si:#C02F58;
+  --warn-bg:#FFF3D6; --warn-ink:#6B4A00; --ok-bg:#E1F2E8; --ok-ink:#1D5A3A;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1418; --panel:#151D23; --ink:#E2E8EC; --muted:#93A2AE; --rule:#2A3640; --grid:#1D2830;
+  --accent:#72AAEE; --accent-soft:#1B2C40;
+  --wi:#5CC48A; --mi:#E3B43E; --si:#F06A8E;
+  --warn-bg:#3A2E10; --warn-ink:#F3D58A; --ok-bg:#12301F; --ok-ink:#A5E3BD;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1418; --panel:#151D23; --ink:#E2E8EC; --muted:#93A2AE; --rule:#2A3640; --grid:#1D2830;
+  --accent:#72AAEE; --accent-soft:#1B2C40;
+  --wi:#5CC48A; --mi:#E3B43E; --si:#F06A8E;
+  --warn-bg:#3A2E10; --warn-ink:#F3D58A; --ok-bg:#12301F; --ok-ink:#A5E3BD;
+  color-scheme:dark}
+
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:980px;margin:0 auto;padding-block:40px 80px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.1;margin:0}
+h1{font-size:clamp(44px,8vw,84px);font-weight:800;font-stretch:78%;letter-spacing:-.01em}
+h2{font-size:clamp(26px,3.6vw,34px);font-weight:700;font-stretch:85%;margin-top:72px;margin-bottom:14px}
+h3{font-size:20px;font-weight:700;font-stretch:90%;margin-top:28px;margin-bottom:6px}
+p{margin:0 0 14px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sec-no{font-family:var(--f-mono);font-size:13px;color:var(--accent);letter-spacing:.08em;display:block;margin-bottom:6px}
+.lede{font-size:20px;max-width:60ch;color:var(--ink)}
+.muted{color:var(--muted)}
+sub{font-size:.7em}
+.eq{font-family:var(--f-mono);font-size:.92em;background:var(--accent-soft);padding:1px 6px;border-radius:3px;white-space:nowrap}
+.eqblock{font-family:var(--f-mono);font-size:15px;background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--accent);padding:12px 16px;margin:16px 0;overflow-x:auto;line-height:1.9}
+.hero{display:grid;gap:22px;padding-bottom:28px;border-bottom:1px solid var(--rule)}
+.hero h1 i{font-style:normal;color:var(--accent)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:6px}
+.fact{background:var(--panel);padding:14px 16px;display:grid;gap:4px;align-content:start}
+.fact b{font-family:var(--f-mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.fact span{font-size:14px;color:var(--muted);line-height:1.4}
+.toc{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--f-display);font-size:15px;font-stretch:90%}
+.toc a{color:var(--muted);text-decoration:none}.toc a:hover{color:var(--accent)}
+a{color:var(--accent)}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.figure{background:var(--panel);border:1px solid var(--rule);padding:18px;margin:22px 0;display:grid;gap:14px}
+.figure figcaption{font-size:14px;color:var(--muted);line-height:1.5}
+.figure figcaption b{color:var(--ink)}
+canvas{width:100%;display:block;touch-action:none;cursor:crosshair}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.grid2>*{min-width:0}
+.chart-title{font-family:var(--f-display);font-size:14px;font-weight:700;font-stretch:88%;letter-spacing:.02em;margin-bottom:4px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 24px;align-items:end}
+.ctl{display:grid;gap:4px}
+.ctl label{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl label output{color:var(--ink);font-weight:600;text-transform:none;letter-spacing:0;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=number]{font-family:var(--f-mono);font-size:15px;padding:6px 8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:3px;width:100%;box-sizing:border-box}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.ro{background:var(--paper);padding:10px 12px;display:grid;gap:2px}
+.ro span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ro b{font-family:var(--f-mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:12px;padding:2px 8px;border-radius:99px;color:#fff;font-weight:600}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.presets button{font-family:var(--f-mono);font-size:13px;padding:6px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:3px;cursor:pointer}
+.presets button:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:15px;padding:10px 14px;border-radius:3px}
+.note.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.note.ok{background:var(--ok-bg);color:var(--ok-ink)}
+
+.regions{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin:18px 0}
+.region{border-top:4px solid var(--c);padding-top:10px;display:grid;gap:6px;align-content:start}
+.region h3{margin:0;color:var(--c)}
+.region .k{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.region p{font-size:15.5px;margin:0}
+
+.flow{list-style:none;padding:0;margin:20px 0;display:grid;gap:0;counter-reset:s}
+.flow li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--rule)}
+.flow li:last-child{border-bottom:1px solid var(--rule)}
+.flow li::before{content:counter(s);font-family:var(--f-display);font-size:30px;font-weight:800;font-stretch:78%;color:var(--accent);line-height:1}
+.flow li b{font-family:var(--f-display);font-stretch:90%;font-size:17px;display:block;margin-bottom:2px}
+.flow li p{margin:0;font-size:15.5px}
+.flow li>div{min-width:0}
+
+.tablewrap{overflow-x:auto;margin:18px 0;border:1px solid var(--rule);background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+
+.schem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:center}
+@media (max-width:700px){.schem{grid-template-columns:1fr}}
+.schem svg{width:100%;max-width:380px;height:auto;justify-self:center}
+.schem svg .w{stroke:var(--ink);stroke-width:1.6;fill:none;stroke-linecap:square}
+.schem svg .hl{stroke:var(--accent);stroke-width:2.4}
+.schem svg text{font-family:var(--f-mono);font-size:12px;fill:var(--ink)}
+.schem svg text.lab{fill:var(--muted);font-size:11px}
+.schem svg text.hlt{fill:var(--accent);font-weight:600}
+.schem svg circle.dot{fill:var(--ink)}
+.schem svg circle.bub{fill:var(--panel);stroke:var(--ink);stroke-width:1.4}
+
+.cheat{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:18px 0}
+.cheat div{background:var(--panel);padding:14px 16px;display:grid;gap:6px;align-content:start}
+.cheat code{font-family:var(--f-mono);font-size:14px}
+.cheat span{font-size:14px;color:var(--muted);line-height:1.45}
+footer{margin-top:72px;padding-top:18px;border-top:1px solid var(--rule);font-size:14px;color:var(--muted)}
+footer ul{padding-left:18px;margin:8px 0}
+@media (max-width:520px){body{font-size:16px}.lede{font-size:18px}.figure{padding:12px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">Analog CMOS design · a working tutorial</div>
+  <h1>The g<sub>m</sub>/I<sub>D</sub> <i>method</i></h1>
+  <p class="lede">Size MOSFETs from one number that stays meaningful from weak to strong inversion. This page explains what that number is, why it works, and walks you through a real sizing, with live device curves you can drag.</p>
+  <div class="facts">
+    <div class="fact"><b>g<sub>m</sub>/I<sub>D</sub> = ∂ln I<sub>D</sub>/∂V<sub>GS</sub></b><span>Transconductance bought per unit of bias current. Units: V⁻¹ (or S/A).</span></div>
+    <div class="fact"><b>≈ 25–30 V⁻¹</b><span>The ceiling, 1/(nU<sub>T</sub>), reached in weak inversion. A BJT reaches 1/U<sub>T</sub> ≈ 39 V⁻¹.</span></div>
+    <div class="fact"><b>2 / V<sub>OV</sub></b><span>What it reduces to in strong inversion. gm/ID = 10 V⁻¹ ≈ 200 mV of overdrive.</span></div>
+  </div>
+  <nav class="toc" aria-label="Sections">
+    <a href="#why">1 Why</a><a href="#meaning">2 The log slope</a><a href="#regions">3 Inversion regions</a><a href="#tradeoff">4 Speed vs efficiency</a><a href="#trick">5 The width trick</a><a href="#flow">6 The procedure</a><a href="#example">7 Worked example</a><a href="#choose">8 Picking values</a><a href="#pitfalls">9 Pitfalls</a><a href="#cheat">10 Cheat sheet</a>
+  </nav>
+</header>
+
+<section id="why">
+  <h2><span class="sec-no">01</span>Why the square law lets you down</h2>
+  <div class="prose">
+    <p>Most of us learn to size transistors with the long-channel square law, <span class="eq">I<sub>D</sub> = ½ μC<sub>ox</sub>(W/L)(V<sub>GS</sub>−V<sub>T</sub>)²</span>. It gives tidy hand equations, and it is wrong in exactly the places modern analog design lives.</p>
+    <p>Low-power circuits bias devices with small overdrive, often below threshold. There the current is exponential in V<sub>GS</sub>, so the square law predicts a transconductance that runs off to infinity as V<sub>OV</sub> → 0. Short-channel devices add velocity saturation and mobility degradation, so even in strong inversion the hand numbers can be off by a factor of two. You end up guessing, simulating, and adjusting W until it works.</p>
+    <p>The g<sub>m</sub>/I<sub>D</sub> method, introduced by Silveira, Flandre and Jespers in 1996, replaces the model with measured (simulated) device data. You still design by hand, but against curves from your actual process, indexed by a variable that behaves well in every region of operation.</p>
+  </div>
+</section>
+
+<section id="meaning">
+  <h2><span class="sec-no">02</span>What g<sub>m</sub>/I<sub>D</sub> really is: a log slope</h2>
+  <div class="prose">
+    <p>Write the definition a slightly different way:</p>
+  </div>
+  <div class="eqblock">g<sub>m</sub>/I<sub>D</sub> = (1/I<sub>D</sub>)·(∂I<sub>D</sub>/∂V<sub>GS</sub>) = ∂(ln I<sub>D</sub>)/∂V<sub>GS</sub></div>
+  <div class="prose">
+    <p>Plot the drain current on a log axis against V<sub>GS</sub>. The slope of that curve <em>is</em> g<sub>m</sub>/I<sub>D</sub> (times ln 10 if you use log<sub>10</sub>). Below threshold the current is exponential, so the log plot is a straight line and the slope is at its maximum. As the device turns on harder, the curve bends over and the slope falls. Drag across the chart to see this.</p>
+  </div>
+  <figure class="figure">
+    <div class="controls">
+      <div class="ctl"><label for="vgs">V<sub>GS</sub> <output id="vgsOut">0.50 V</output></label><input id="vgs" type="range" min="0.15" max="1.35" step="0.005" value="0.50"></div>
+    </div>
+    <div class="grid2">
+      <div><div class="chart-title">Drain current density I<sub>D</sub>/W (log), L = 1 µm</div><canvas id="cIdVgs" aria-label="Log drain current versus gate voltage with tangent line"></canvas></div>
+      <div><div class="chart-title">g<sub>m</sub>/I<sub>D</sub> vs V<sub>GS</sub></div><canvas id="cGmVgs" aria-label="gm over ID versus gate voltage compared with square law"></canvas></div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><span>Region</span><b id="r2Reg">–</b></div>
+      <div class="ro"><span>Inversion coeff. IC</span><b id="r2IC">–</b></div>
+      <div class="ro"><span>I<sub>D</sub>/W</span><b id="r2IdW">–</b></div>
+      <div class="ro"><span>g<sub>m</sub>/I<sub>D</sub> (EKV)</span><b id="r2Gm">–</b></div>
+      <div class="ro"><span>Square law 2/V<sub>OV</sub></span><b id="r2Sq">–</b></div>
+    </div>
+    <figcaption><b>Left:</b> the dashed tangent's slope is g<sub>m</sub>/I<sub>D</sub>. <b>Right:</b> the solid curve is a smooth (EKV) model valid in all regions; the dashed red curve is the square-law prediction 2/(V<sub>GS</sub>−V<sub>T</sub>), which explodes near threshold. The flat dotted line is the weak-inversion ceiling 1/(nU<sub>T</sub>). Drag on either chart.</figcaption>
+  </figure>
+  <div class="prose">
+    <p>Two intuitions fall out of this picture.</p>
+    <p><b>It is an efficiency.</b> Gain, bandwidth and noise all depend on g<sub>m</sub>. Power depends on I<sub>D</sub>. So g<sub>m</sub>/I<sub>D</sub> tells you how much useful transconductance each microamp buys. A device at 25 V⁻¹ gives you more than three times the g<sub>m</sub> of one at 7 V⁻¹ for the same current.</p>
+    <p><b>It is the overdrive that still works below threshold.</b> In strong inversion g<sub>m</sub>/I<sub>D</sub> = 2/V<sub>OV</sub>, so every designer's intuition for V<sub>OV</sub> carries over: 10 V⁻¹ is about 200 mV of overdrive, 5 V⁻¹ about 400 mV. Unlike V<sub>OV</sub>, though, g<sub>m</sub>/I<sub>D</sub> stays finite and accurate as you go into moderate and weak inversion.</p>
+  </div>
+</section>
+
+<section id="regions">
+  <h2><span class="sec-no">03</span>The three inversion regions</h2>
+  <div class="prose">
+    <p>A cleaner horizontal axis than V<sub>GS</sub> is the <b>inversion coefficient</b>, IC = I<sub>D</sub> / I<sub>spec</sub>, where I<sub>spec</sub> = 2nμC<sub>ox</sub>U<sub>T</sub>²·(W/L) is the current at which the device sits right in the middle of moderate inversion. IC strips out size and threshold, so every transistor in every process traces out nearly the same g<sub>m</sub>/I<sub>D</sub> curve:</p>
+  </div>
+  <figure class="figure">
+    <canvas id="cRegions" aria-label="gm over ID versus inversion coefficient with three regions shaded"></canvas>
+    <figcaption>Normalised g<sub>m</sub>/I<sub>D</sub> vs inversion coefficient on a log axis. Moderate inversion spans two decades, IC ≈ 0.1 to 10. The dashed lines are the two textbook limits: constant 1/(nU<sub>T</sub>) on the left and the square-law 1/(nU<sub>T</sub>√IC) on the right. Real devices follow neither in the middle, which is exactly where many good analog designs are biased.</figcaption>
+  </figure>
+  <div class="regions">
+    <div class="region" style="--c:var(--wi)"><h3>Weak inversion</h3><div class="k">IC &lt; 0.1 · gm/ID ≈ 22–30 V⁻¹</div><p>Diffusion current, exponential I–V, BJT-like. Maximum g<sub>m</sub> per amp, tiny current density, so wide devices with large capacitance and low f<sub>T</sub>. Home of low-power sensors and biomedical front ends.</p></div>
+    <div class="region" style="--c:var(--mi)"><h3>Moderate inversion</h3><div class="k">0.1 &lt; IC &lt; 10 · gm/ID ≈ 10–22 V⁻¹</div><p>Neither diffusion nor drift dominates. No simple hand formula fits, which is why the square-law approach struggles here. Often the best compromise between efficiency and speed.</p></div>
+    <div class="region" style="--c:var(--si)"><h3>Strong inversion</h3><div class="k">IC &gt; 10 · gm/ID ≈ 3–10 V⁻¹</div><p>Drift current, square-law-ish (then velocity-limited at short L). High current density, small devices, high f<sub>T</sub>, but each microamp buys little g<sub>m</sub>. Used for speed, matching and large signal swing per device.</p></div>
+  </div>
+</section>
+
+<section id="tradeoff">
+  <h2><span class="sec-no">04</span>The trade-off: efficiency against speed</h2>
+  <div class="prose">
+    <p>Increase g<sub>m</sub>/I<sub>D</sub> and you push the device toward weak inversion. You get more g<sub>m</sub> per amp, but the current density drops, so for a given current the device must be wider. Wider means more gate capacitance per unit of g<sub>m</sub>, so the transit frequency f<sub>T</sub> = g<sub>m</sub>/(2πC<sub>gg</sub>) falls. Channel length L is the second knob: longer L raises intrinsic gain g<sub>m</sub>/g<sub>ds</sub> but costs f<sub>T</sub> roughly as 1/L².</p>
+    <p>Pick a g<sub>m</sub>/I<sub>D</sub> and a length below. The bold curve is the selected L; the faint curves are the other lengths.</p>
+  </div>
+  <figure class="figure">
+    <div class="controls">
+      <div class="ctl"><label for="xg">g<sub>m</sub>/I<sub>D</sub> <output id="xgOut">15 V⁻¹</output></label><input id="xg" type="range" min="4" max="28" step="0.5" value="15"></div>
+      <div class="ctl"><label for="xl">Channel length L <output id="xlOut">0.5 µm</output></label><input id="xl" type="range" min="0" max="7" step="1" value="3"></div>
+    </div>
+    <div class="grid2">
+      <div><div class="chart-title">Current density I<sub>D</sub>/W (µA/µm)</div><canvas id="cIdW"></canvas></div>
+      <div><div class="chart-title">Transit frequency f<sub>T</sub></div><canvas id="cFt"></canvas></div>
+      <div><div class="chart-title">Intrinsic gain g<sub>m</sub>/g<sub>ds</sub> (V/V)</div><canvas id="cGain"></canvas></div>
+      <div><div class="chart-title">Figure of merit g<sub>m</sub>/I<sub>D</sub> · f<sub>T</sub> (selected L)</div><canvas id="cFom"></canvas></div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><span>Region</span><b id="r4Reg">–</b></div>
+      <div class="ro"><span>IC</span><b id="r4IC">–</b></div>
+      <div class="ro"><span>I<sub>D</sub>/W</span><b id="r4IdW">–</b></div>
+      <div class="ro"><span>f<sub>T</sub></span><b id="r4Ft">–</b></div>
+      <div class="ro"><span>g<sub>m</sub>/g<sub>ds</sub></span><b id="r4Gain">–</b></div>
+      <div class="ro"><span>V<sub>Dsat</sub> ≈ 2/(g<sub>m</sub>/I<sub>D</sub>)</span><b id="r4Vd">–</b></div>
+    </div>
+    <figcaption>Every quantity here depends only on g<sub>m</sub>/I<sub>D</sub> and L, never on W. The product g<sub>m</sub>/I<sub>D</sub>·f<sub>T</sub> (efficiency times speed) peaks in moderate inversion, which is why g<sub>m</sub>/I<sub>D</sub> of roughly 10–15 V⁻¹ is a common default for amplifiers that need some of both. Drag on any chart to move the cursor.</figcaption>
+  </figure>
+</section>
+
+<section id="trick">
+  <h2><span class="sec-no">05</span>The trick that makes it work: width drops out</h2>
+  <div class="prose">
+    <p>Think of a wide transistor as many narrow unit transistors in parallel. Double W and you double I<sub>D</sub>, g<sub>m</sub>, g<sub>ds</sub> and every capacitance, at the same bias voltages. Ratios of these quantities do not change. So:</p>
+  </div>
+  <div class="eqblock">g<sub>m</sub>/I<sub>D</sub>, &nbsp; I<sub>D</sub>/W, &nbsp; f<sub>T</sub> = g<sub>m</sub>/2πC<sub>gg</sub>, &nbsp; g<sub>m</sub>/g<sub>ds</sub> &nbsp; → &nbsp; functions of (V<sub>GS</sub>, V<sub>DS</sub>, L) only</div>
+  <div class="prose">
+    <p>Because g<sub>m</sub>/I<sub>D</sub> is a one-to-one function of V<sub>GS</sub> (at a given L), you can use it as the index instead. Now a transistor is described by <b>two design knobs</b>, g<sub>m</sub>/I<sub>D</sub> and L, which set all of its <em>quality</em> (speed, gain, density, headroom), plus <b>one scale factor</b>, the current I<sub>D</sub> (or equivalently W), which sets its <em>quantity</em>.</p>
+    <p>That separation is the whole method. You choose quality per device from its role in the circuit, the specs fix how much g<sub>m</sub> you need, and the width simply follows: <span class="eq">W = I<sub>D</sub> / (I<sub>D</sub>/W)</span>, with I<sub>D</sub>/W read from a lookup table.</p>
+    <p>The lookup tables come from your process design kit. Simulate one unit-width NMOS and PMOS, sweep V<sub>GS</sub>, V<sub>DS</sub>, L (and V<sub>SB</sub> if you care), and save g<sub>m</sub>, g<sub>ds</sub>, I<sub>D</sub> and the capacitances. Because the data come from the foundry's own models, short-channel effects are included automatically, which no hand equation can match.</p>
+  </div>
+</section>
+
+<section id="flow">
+  <h2><span class="sec-no">06</span>The design procedure</h2>
+  <ol class="flow">
+    <li><div><b>Translate specs into required g<sub>m</sub></b><p>Bandwidth, gain-bandwidth, noise and settling usually set a transconductance. For a single-stage OTA, g<sub>m</sub> = 2π·GBW·C<sub>L</sub>. For noise, input-referred thermal noise ≈ 4kTγ/g<sub>m</sub>.</p></div></li>
+    <li><div><b>Choose g<sub>m</sub>/I<sub>D</sub> for each device from its role</b><p>Input pairs that need low power and noise go high (15–25). Devices that must be fast, match well or keep a small V<sub>Dsat</sub> trade-off go low (5–10). See section 8.</p></div></li>
+    <li><div><b>Choose L</b><p>Longer L for intrinsic gain and lower flicker noise and mismatch; shorter L for f<sub>T</sub>. Check gain and f<sub>T</sub> on the (g<sub>m</sub>/I<sub>D</sub>, L) curves.</p></div></li>
+    <li><div><b>Compute the current</b><p>I<sub>D</sub> = g<sub>m</sub> / (g<sub>m</sub>/I<sub>D</sub>). This is your power budget for the device.</p></div></li>
+    <li><div><b>Compute the width</b><p>Read I<sub>D</sub>/W at (g<sub>m</sub>/I<sub>D</sub>, L) from the table; W = I<sub>D</sub> / (I<sub>D</sub>/W). Also read V<sub>GS</sub> and capacitances for biasing and parasitic estimates.</p></div></li>
+    <li><div><b>Verify and iterate in simulation</b><p>Check headroom, f<sub>T</sub> margin over signal frequency (aim for 10× or more), parasitic poles from the device's own C<sub>gg</sub>, then simulate. Results usually land within a few percent because the tables came from the same models.</p></div></li>
+  </ol>
+</section>
+
+<section id="example">
+  <h2><span class="sec-no">07</span>Worked example: the input pair of a 5-transistor OTA</h2>
+  <div class="schem">
+    <div class="prose">
+      <p><b>Spec:</b> gain-bandwidth 50 MHz driving a 1 pF load. In a single-stage OTA the unity-gain frequency is g<sub>m1</sub>/(2πC<sub>L</sub>), so the input pair needs g<sub>m1</sub> = 2π × 50 MHz × 1 pF ≈ 314 µS.</p>
+      <p>The interesting decision is g<sub>m</sub>/I<sub>D</sub>. Try the presets: at 8 V⁻¹ the pair is small and very fast but burns current; at 22 V⁻¹ the current is tiny but the device grows wide, and its gate capacitance starts to load the previous stage.</p>
+    </div>
+    <svg id="ota" viewBox="0 0 380 300" role="img" aria-label="Schematic of a five-transistor OTA with the input pair M1 and M2 highlighted"></svg>
+  </div>
+  <figure class="figure">
+    <div class="controls">
+      <div class="ctl"><label for="eGbw">GBW (MHz)</label><input id="eGbw" type="number" min="0.1" step="any" value="50"></div>
+      <div class="ctl"><label for="eCl">C<sub>L</sub> (pF)</label><input id="eCl" type="number" min="0.01" step="any" value="1"></div>
+      <div class="ctl"><label for="eVdd">V<sub>DD</sub> (V)</label><input id="eVdd" type="number" min="0.3" step="any" value="1.8"></div>
+      <div class="ctl"><label for="eg">Input pair g<sub>m</sub>/I<sub>D</sub> <output id="egOut">15 V⁻¹</output></label><input id="eg" type="range" min="4" max="27" step="0.5" value="15"></div>
+      <div class="ctl"><label for="el">Input pair L <output id="elOut">0.5 µm</output></label><input id="el" type="range" min="0" max="7" step="1" value="3"></div>
+      <div class="ctl"><label>Presets</label><div class="presets"><button type="button" data-g="8">Fast · 8</button><button type="button" data-g="15">Balanced · 15</button><button type="button" data-g="22">Low power · 22</button></div></div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><span>Required g<sub>m1</sub></span><b id="eGm">–</b></div>
+      <div class="ro"><span>I<sub>D</sub> per side</span><b id="eId">–</b></div>
+      <div class="ro"><span>Tail current (M5)</span><b id="eTail">–</b></div>
+      <div class="ro"><span>Width W<sub>1,2</sub></span><b id="eW">–</b></div>
+      <div class="ro"><span>Gate cap C<sub>gg</sub></span><b id="eC">–</b></div>
+      <div class="ro"><span>f<sub>T</sub> / GBW</span><b id="eRatio">–</b></div>
+      <div class="ro"><span>DC gain ≈ ½·g<sub>m</sub>/g<sub>ds</sub></span><b id="eAv">–</b></div>
+      <div class="ro"><span>OTA power</span><b id="eP">–</b></div>
+    </div>
+    <div id="eNote" class="note ok">–</div>
+    <div><div class="chart-title">Current and width needed to hit this spec, vs input-pair g<sub>m</sub>/I<sub>D</sub></div><canvas id="cEx" aria-label="Current and width versus gm over ID for the OTA specification"></canvas></div>
+    <figcaption>The two curves cross the whole trade-off in one picture: moving right saves current (blue) but costs width and capacitance (red). The gain estimate assumes the PMOS load has a similar g<sub>m</sub>/g<sub>ds</sub> at the same L; the power ignores the bias branch.</figcaption>
+  </figure>
+  <div class="prose">
+    <h3>Reading the result</h3>
+    <p>At the balanced choice (15 V⁻¹, L = 0.5 µm) each side needs about 21 µA and roughly 9 µm of width, with f<sub>T</sub> more than 30× above GBW. That margin matters because the non-dominant pole at the mirror node sits near g<sub>m3</sub>/C<sub>mirror</sub>, and the input pair's own gate capacitance loads whatever drives it.</p>
+    <p>The remaining devices follow the same recipe. The PMOS mirror M3/M4 is usually set to a lower g<sub>m</sub>/I<sub>D</sub> (around 8–10) for better current matching and a higher mirror pole; it carries the same I<sub>D</sub>, so its width comes straight from the PMOS table. The tail M5 carries 2I<sub>D</sub>; a low g<sub>m</sub>/I<sub>D</sub> gives it a compact layout and good matching with its bias reference, at the cost of a larger V<sub>Dsat</sub> eating into common-mode range.</p>
+  </div>
+</section>
+
+<section id="choose">
+  <h2><span class="sec-no">08</span>Choosing g<sub>m</sub>/I<sub>D</sub> by device role</h2>
+  <div class="prose"><p>These ranges are starting points for bulk CMOS. Treat them as a first guess, then let the specs move you.</p></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Device role</th><th>Typical g<sub>m</sub>/I<sub>D</sub></th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>High-speed / RF devices, wideband buffers</td><td class="num">5 – 8 V⁻¹</td><td>Maximises f<sub>T</sub>; keeps devices and parasitics small.</td></tr>
+        <tr><td>Current mirrors, current sources, tail devices</td><td class="num">5 – 10 V⁻¹</td><td>Current mismatch scales as σ(ΔI/I) ≈ (g<sub>m</sub>/I<sub>D</sub>)·σ(V<sub>T</sub>), so low values match better. Also lowers the noise current they inject (g<sub>m</sub> is smaller for the same I<sub>D</sub>).</td></tr>
+        <tr><td>General OTA input pairs, gain stages</td><td class="num">10 – 15 V⁻¹</td><td>Near the peak of g<sub>m</sub>/I<sub>D</sub>·f<sub>T</sub>: a good balance of power and speed.</td></tr>
+        <tr><td>Low-power, low-noise input pairs (sensors, biomedical, ULP)</td><td class="num">18 – 25 V⁻¹</td><td>Maximises g<sub>m</sub> per µA, so minimum thermal noise per unit power; large area also lowers flicker noise and offset.</td></tr>
+        <tr><td>Cascode devices</td><td class="num">10 – 20 V⁻¹</td><td>High g<sub>m</sub>/I<sub>D</sub> keeps V<sub>Dsat</sub> small, saving headroom; watch the pole their capacitance adds.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <h3>Rules of thumb that fall out of the curves</h3>
+    <p><b>Headroom:</b> V<sub>Dsat</sub> ≈ 2/(g<sub>m</sub>/I<sub>D</sub>). At 20 V⁻¹ a device needs only ~100 mV across it to stay saturated, which is why high g<sub>m</sub>/I<sub>D</sub> suits low-voltage design.</p>
+    <p><b>Noise:</b> for fixed current, input-referred thermal noise power falls as 1/(g<sub>m</sub>/I<sub>D</sub>). Doubling g<sub>m</sub>/I<sub>D</sub> halves the noise power without spending another microamp.</p>
+    <p><b>Diminishing returns:</b> past ~22 V⁻¹ the curve flattens toward its ceiling. Going from 22 to 26 gains about 18% efficiency but can cost several times the width and capacitance. The last few V⁻¹ are rarely worth it.</p>
+  </div>
+</section>
+
+<section id="pitfalls">
+  <h2><span class="sec-no">09</span>Practical pitfalls</h2>
+  <div class="prose">
+    <p><b>Use the right V<sub>DS</sub> and V<sub>SB</sub>.</b> Tables are usually generated at V<sub>DS</sub> = V<sub>DD</sub>/2 and V<sub>SB</sub> = 0. g<sub>ds</sub> in particular changes a lot with V<sub>DS</sub>, and source-follower or stacked devices see body effect. Generate tables at the operating point you expect, or interpolate in V<sub>DS</sub>.</p>
+    <p><b>Use the same L you looked up.</b> Every figure of merit depends strongly on L. Mixing a table at 0.5 µm with a layout at 0.35 µm throws the numbers off.</p>
+    <p><b>Include extrinsic capacitance.</b> f<sub>T</sub> from C<sub>gg</sub> is the device's own limit. Junction caps, overlap and wiring add to it; at short L overlap capacitance can be a large fraction of the total.</p>
+    <p><b>Check minimum width and fingers.</b> Very low currents at low g<sub>m</sub>/I<sub>D</sub> can produce widths below the process minimum, while very high g<sub>m</sub>/I<sub>D</sub> can produce widths that need many fingers. Either is a hint to revisit the choice.</p>
+    <p><b>The model on this page is illustrative.</b> The curves here use a long-channel EKV model with 180 nm-class parameters, no velocity saturation and a simple Early voltage. They show the shapes and trends correctly, but sign-off numbers must come from your PDK's lookup tables. Boris Murmann's open-source gm/ID starter kit and the Python package <span class="eq">pygmid</span> are common ways to build and query them.</p>
+  </div>
+</section>
+
+<section id="cheat">
+  <h2><span class="sec-no">10</span>Cheat sheet</h2>
+  <div class="cheat">
+    <div><code>gm/ID = ∂ln ID / ∂VGS</code><span>Definition. Slope of log I<sub>D</sub> vs V<sub>GS</sub>.</span></div>
+    <div><code>gm/ID → 1/(n·UT) ≈ 25–30 V⁻¹</code><span>Weak-inversion ceiling (n ≈ 1.2–1.5, U<sub>T</sub> ≈ 25.9 mV at 300 K).</span></div>
+    <div><code>gm/ID ≈ 2 / VOV</code><span>Strong inversion, long channel.</span></div>
+    <div><code>IC = ID / (2n·μCox·UT²·W/L)</code><span>Inversion coefficient. WI &lt; 0.1 &lt; MI &lt; 10 &lt; SI.</span></div>
+    <div><code>ID = gm / (gm/ID)</code><span>Current from required g<sub>m</sub>.</span></div>
+    <div><code>W = ID / (ID/W)</code><span>Width from current density, read at (g<sub>m</sub>/I<sub>D</sub>, L).</span></div>
+    <div><code>fT = gm / (2π·Cgg)</code><span>Depends on g<sub>m</sub>/I<sub>D</sub> and L only. Aim fT ≥ 10× signal frequency.</span></div>
+    <div><code>A0 = gm/gds = (gm/ID)·VA</code><span>Intrinsic gain. V<sub>A</sub> grows with L.</span></div>
+    <div><code>VDsat ≈ 2 / (gm/ID)</code><span>Headroom estimate; floors near 3–4 U<sub>T</sub> in weak inversion.</span></div>
+    <div><code>σ(ΔI/I) ≈ (gm/ID)·σVT</code><span>Mirror mismatch: lower g<sub>m</sub>/I<sub>D</sub> matches better.</span></div>
+  </div>
+</section>
+
+<footer>
+  <b>Further reading</b>
+  <ul>
+    <li>P. Jespers and B. Murmann, <i>Systematic Design of Analog CMOS Circuits Using Pre-Computed Lookup Tables</i>, Cambridge University Press, 2017.</li>
+    <li>F. Silveira, D. Flandre and P. Jespers, “A g<sub>m</sub>/I<sub>D</sub> based methodology for the design of CMOS analog circuits and its application to the synthesis of a silicon-on-insulator micropower OTA,” <i>IEEE JSSC</i>, 1996.</li>
+    <li>C. Enz and E. Vittoz, <i>Charge-Based MOS Transistor Modeling: The EKV Model for Low-Power and RF IC Design</i>, Wiley, 2006.</li>
+  </ul>
+  <p>Model on this page: EKV interpolation IC = ln²(1+e<sup>(V<sub>GS</sub>−V<sub>T</sub>)/2nU<sub>T</sub></sup>); n = 1.3, U<sub>T</sub> = 25.85 mV, μC<sub>ox</sub> = 280 µA/V², C<sub>ox</sub> = 8.5 fF/µm², V<sub>T</sub> = 0.45 V, C<sub>ov</sub> = 0.3 fF/µm per side, V<sub>A</sub> = 6 V/µm × L. Long-channel physics only.</p>
+</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+// ---------- device model (EKV interpolation) ----------
+const P={n:1.3,UT:0.02585,muCox:280e-6,Cox:8.5e-3,Cov:0.3e-9,VE:6e6,VT:0.45};
+const ISQ=2*P.n*P.muCox*P.UT*P.UT; // specific current per square (A)
+const LS=[0.18,0.25,0.35,0.5,0.8,1,1.5,2]; // µm
+const GMAX=1/(P.n*P.UT);
+const sp=u=>u>35?u:Math.log1p(Math.exp(u));
+const sig=u=>1/(1+Math.exp(-u));
+function atU(u){const s=sp(u);return{u,IC:s*s,gmid:sig(u)/(s*P.n*P.UT),vgs:P.VT+2*P.n*P.UT*u};}
+function uFromG(g){let lo=-30,hi=80;for(let i=0;i<90;i++){const m=(lo+hi)/2;if(atU(m).gmid>g)lo=m;else hi=m;}return (lo+hi)/2;}
+function dev(g,Lum){ // g = gm/ID (1/V), L in µm
+  const L=Lum*1e-6,o=atU(uFromG(g));
+  const IdW=ISQ*o.IC/L;               // A/m == µA/µm
+  const gmW=IdW*g;                    // S/m
+  const CggW=(2/3)*P.Cox*L+2*P.Cov;   // F/m
+  return{IC:o.IC,vgs:o.vgs,IdW,gmW,CggW,fT:gmW/(2*Math.PI*CggW),gain:g*P.VE*L};
+}
+function region(IC){return IC<0.1?["Weak inv.","--wi"]:IC<10?["Moderate inv.","--mi"]:["Strong inv.","--si"];}
+
+// ---------- formatting ----------
+function eng(v,unit,d){d=d||3;if(!isFinite(v))return"–";const pre=[[1e9,"G"],[1e6,"M"],[1e3,"k"],[1,""],[1e-3,"m"],[1e-6,"µ"],[1e-9,"n"],[1e-12,"p"],[1e-15,"f"]];const a=Math.abs(v);for(const[f,s]of pre){if(a>=f*0.9995)return(v/f).toPrecision(d)+" "+s+unit;}return v.toExponential(2)+" "+unit;}
+const fx=(v,d)=>Number(v).toFixed(d);
+function icFmt(v){return v<0.01?v.toExponential(1):v<10?v.toPrecision(2):v.toFixed(0);}
+const $=id=>document.getElementById(id);
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||"#888";}
+function regionHTML(IC){const[r,c]=region(IC);return '<span class="pill" style="background:var('+c+')">'+r+'</span>';}
+
+// ---------- chart engine ----------
+const charts=[];
+function plot(cv,cfg){
+  const dpr=window.devicePixelRatio||1,w=cv.clientWidth||300;
+  const h=Math.round(Math.max(210,Math.min(cfg.tall?360:300,w*(cfg.tall?0.5:0.64))));
+  cv.style.height=h+"px";cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+  const m={l:52,r:12,t:12,b:38},pw=w-m.l-m.r,ph=h-m.t-m.b;
+  const X=cfg.x,Y=cfg.y,L10=Math.log10;
+  const tx=v=>X.log?m.l+(L10(v)-L10(X.min))/(L10(X.max)-L10(X.min))*pw:m.l+(v-X.min)/(X.max-X.min)*pw;
+  const ty=v=>Y.log?m.t+ph-(L10(v)-L10(Y.min))/(L10(Y.max)-L10(Y.min))*ph:m.t+ph-(v-Y.min)/(Y.max-Y.min)*ph;
+  cv._inv=px=>{const f=(px-m.l)/pw;return X.log?Math.pow(10,L10(X.min)+f*(L10(X.max)-L10(X.min))):X.min+f*(X.max-X.min);};
+  const ink=cssv("--ink"),muted=cssv("--muted"),grid=cssv("--grid"),rule=cssv("--rule");
+  c.font="11px "+cssv("--f-mono");
+  // bands
+  (cfg.bands||[]).forEach(b=>{const x0=tx(Math.max(b.from,X.min)),x1=tx(Math.min(b.to,X.max));c.globalAlpha=0.12;c.fillStyle=cssv(b.color);c.fillRect(x0,m.t,x1-x0,ph);c.globalAlpha=1;c.fillStyle=cssv(b.color);c.textAlign="center";c.fillText(b.label,(x0+x1)/2,m.t+13);});
+  // ticks
+  function ticks(A){const t=[];if(A.log){for(let k=Math.floor(L10(A.min));k<=Math.ceil(L10(A.max));k++){for(let j=1;j<10;j++){const v=j*Math.pow(10,k);if(v>=A.min*0.999&&v<=A.max*1.001)t.push({v,major:j===1});}}}else{const span=A.max-A.min,raw=span/(A.n||5),p=Math.pow(10,Math.floor(L10(raw))),st=[1,2,2.5,5,10].map(s=>s*p).find(s=>s>=raw);for(let v=Math.ceil(A.min/st)*st;v<=A.max+1e-9;v+=st)t.push({v,major:true});}return t;}
+  c.lineWidth=1;
+  ticks(X).forEach(t=>{const x=tx(t.v);c.strokeStyle=t.major?rule:grid;c.beginPath();c.moveTo(x,m.t);c.lineTo(x,m.t+ph);c.stroke();if(t.major){c.fillStyle=muted;c.textAlign="center";c.fillText((X.fmt||String)(t.v),x,m.t+ph+15);}});
+  ticks(Y).forEach(t=>{const y=ty(t.v);c.strokeStyle=t.major?rule:grid;c.beginPath();c.moveTo(m.l,y);c.lineTo(m.l+pw,y);c.stroke();if(t.major){c.fillStyle=muted;c.textAlign="right";c.fillText((Y.fmt||String)(t.v),m.l-6,y+4);}});
+  c.fillStyle=muted;c.textAlign="center";c.fillText(X.label||"",m.l+pw/2,h-6);
+  c.save();c.translate(12,m.t+ph/2);c.rotate(-Math.PI/2);c.fillText(Y.label||"",0,0);c.restore();
+  c.save();c.beginPath();c.rect(m.l,m.t,pw,ph);c.clip();
+  (cfg.hlines||[]).forEach(l=>{const y=ty(l.y);c.strokeStyle=cssv(l.color||"--muted");c.setLineDash([2,4]);c.lineWidth=1.3;c.beginPath();c.moveTo(m.l,y);c.lineTo(m.l+pw,y);c.stroke();c.setLineDash([]);if(l.label){c.fillStyle=cssv(l.color||"--muted");c.textAlign="right";c.fillText(l.label,m.l+pw-4,y-5);}});
+  (cfg.series||[]).forEach(s=>{c.strokeStyle=cssv(s.color);c.lineWidth=s.width||2;c.globalAlpha=s.alpha||1;c.setLineDash(s.dash||[]);c.beginPath();let on=false;s.pts.forEach(([a,b])=>{const ok=isFinite(b)&&(!Y.log||b>0)&&(!X.log||a>0);if(!ok){on=false;return;}const x=tx(a),y=ty(Math.max(Math.min(b,Y.max*10),Y.log?Y.min/10:Y.min-1e9));if(on)c.lineTo(x,y);else{c.moveTo(x,y);on=true;}});c.stroke();c.setLineDash([]);c.globalAlpha=1;});
+  (cfg.lines||[]).forEach(l=>{c.strokeStyle=cssv(l.color);c.lineWidth=1.5;c.setLineDash([6,4]);c.beginPath();c.moveTo(tx(l.x0),ty(l.y0));c.lineTo(tx(l.x1),ty(l.y1));c.stroke();c.setLineDash([]);});
+  (cfg.vlines||[]).forEach(l=>{const x=tx(l.x);c.strokeStyle=cssv(l.color||"--ink");c.lineWidth=1;c.globalAlpha=0.5;c.beginPath();c.moveTo(x,m.t);c.lineTo(x,m.t+ph);c.stroke();c.globalAlpha=1;});
+  c.restore();
+  (cfg.points||[]).forEach(p=>{if(!isFinite(p.y))return;const x=tx(p.x),y=ty(p.y);if(y<m.t-2||y>m.t+ph+2)return;c.fillStyle=cssv("--panel");c.strokeStyle=cssv(p.color||"--accent");c.lineWidth=2.5;c.beginPath();c.arc(x,y,5,0,7);c.fill();c.stroke();if(p.label){c.fillStyle=ink;c.textAlign=x>m.l+pw*0.7?"right":"left";c.fillText(p.label,x+(x>m.l+pw*0.7?-9:9),y-8);}});
+  const lg=(cfg.series||[]).filter(s=>s.label);
+  if(lg.length){let y=m.t+(cfg.bands?24:10);c.textAlign="left";lg.forEach(s=>{c.strokeStyle=cssv(s.color);c.lineWidth=2;c.setLineDash(s.dash||[]);c.beginPath();c.moveTo(m.l+10,y-4);c.lineTo(m.l+28,y-4);c.stroke();c.setLineDash([]);c.fillStyle=ink;c.fillText(s.label,m.l+33,y);y+=15;});}
+}
+function bindDrag(cv,fn){let down=false;const go=e=>{const r=cv.getBoundingClientRect();fn(cv._inv(e.clientX-r.left));};
+  cv.addEventListener("pointerdown",e=>{down=true;cv.setPointerCapture(e.pointerId);go(e);});
+  cv.addEventListener("pointermove",e=>{if(down)go(e);});
+  ["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>down=false));}
+const reg=f=>{charts.push(f);f();};
+const redrawAll=()=>charts.forEach(f=>f());
+
+// ---------- section 2 ----------
+const vgsIn=$("vgs");
+const vgsGrid=[];for(let v=0.1;v<=1.4001;v+=0.005)vgsGrid.push(v);
+const s2=()=>{
+  const V=+vgsIn.value,u=(V-P.VT)/(2*P.n*P.UT),o=atU(u),IdW=ISQ*o.IC/1e-6;
+  $("vgsOut").textContent=fx(V,2)+" V";
+  const pts=vgsGrid.map(v=>{const q=atU((v-P.VT)/(2*P.n*P.UT));return[v,ISQ*q.IC/1e-6];});
+  const k=o.gmid/Math.LN10,dV=0.18;
+  const ln={x0:V-dV,y0:IdW*Math.pow(10,-k*dV),x1:V+dV,y1:IdW*Math.pow(10,k*dV),color:"--accent"};
+  plot($("cIdVgs"),{x:{min:0.1,max:1.4,label:"VGS (V)",fmt:v=>v.toFixed(1)},y:{min:1e-6,max:1e3,log:true,label:"ID/W (µA/µm)",fmt:v=>v>=1?String(v):v.toExponential(0).replace("e","e")},
+    bands:[{from:0.1,to:P.VT+2*P.n*P.UT*Math.log(Math.exp(Math.sqrt(0.1))-1),color:"--wi",label:"WI"},{from:P.VT+2*P.n*P.UT*Math.log(Math.exp(Math.sqrt(0.1))-1),to:P.VT+2*P.n*P.UT*Math.log(Math.exp(Math.sqrt(10))-1),color:"--mi",label:"MI"},{from:P.VT+2*P.n*P.UT*Math.log(Math.exp(Math.sqrt(10))-1),to:1.4,color:"--si",label:"SI"}],
+    series:[{pts,color:"--ink",width:2}],lines:[ln],points:[{x:V,y:IdW,label:"slope = "+fx(o.gmid,1)+" V⁻¹"}]});
+  const g1=vgsGrid.map(v=>[v,atU((v-P.VT)/(2*P.n*P.UT)).gmid]);
+  const g2=vgsGrid.filter(v=>v>P.VT+0.02).map(v=>[v,2/(v-P.VT)]);
+  plot($("cGmVgs"),{x:{min:0.1,max:1.4,label:"VGS (V)",fmt:v=>v.toFixed(1)},y:{min:0,max:42,label:"gm/ID (V⁻¹)",n:6},
+    hlines:[{y:GMAX,label:"1/(nUT) = "+fx(GMAX,1),color:"--wi"},{y:1/P.UT,label:"BJT 1/UT = "+fx(1/P.UT,1),color:"--muted"}],
+    series:[{pts:g1,color:"--accent",width:2.4,label:"EKV (all regions)"},{pts:g2,color:"--si",dash:[5,4],width:1.8,label:"Square law 2/VOV"}],
+    vlines:[{x:V}],points:[{x:V,y:o.gmid}]});
+  $("r2Reg").innerHTML=regionHTML(o.IC);$("r2IC").textContent=icFmt(o.IC);
+  $("r2IdW").textContent=eng(IdW*1e-6,"A/µm");$("r2Gm").textContent=fx(o.gmid,1)+" V⁻¹";
+  $("r2Sq").textContent=V>P.VT+0.005?fx(2/(V-P.VT),1)+" V⁻¹":"∞ (V ≤ VT)";
+};
+vgsIn.addEventListener("input",s2);
+const setV=v=>{vgsIn.value=Math.min(1.35,Math.max(0.15,v));s2();};
+bindDrag($("cIdVgs"),setV);bindDrag($("cGmVgs"),setV);
+
+// ---------- section 3 ----------
+const icGrid=[];for(let e=-3;e<=3.0001;e+=0.02)icGrid.push(Math.pow(10,e));
+function gmAtIC(IC){return GMAX*2/(1+Math.sqrt(1+4*IC));} // close smooth form for display
+reg(()=>{
+  const ekv=icGrid.map(ic=>{const u=Math.log(Math.exp(Math.sqrt(ic))-1);return[ic,atU(u).gmid/GMAX];});
+  plot($("cRegions"),{tall:true,x:{min:1e-3,max:1e3,log:true,label:"Inversion coefficient IC = ID / Ispec",fmt:v=>v<1?String(v):v.toFixed(0)},y:{min:0,max:1.1,label:"(gm/ID) / (gm/ID)max",n:5,fmt:v=>v.toFixed(1)},
+    bands:[{from:1e-3,to:0.1,color:"--wi",label:"weak inversion"},{from:0.1,to:10,color:"--mi",label:"moderate inversion"},{from:10,to:1e3,color:"--si",label:"strong inversion"}],
+    series:[{pts:icGrid.map(ic=>[ic,1]),color:"--wi",dash:[3,4],width:1.5},{pts:icGrid.filter(ic=>ic>0.3).map(ic=>[ic,1/Math.sqrt(ic)]),color:"--si",dash:[3,4],width:1.5},{pts:ekv,color:"--accent",width:2.6}],
+    points:[{x:1,y:atU(Math.log(Math.E-1)).gmid/GMAX,label:"IC = 1: ~60% of max",color:"--mi"}]});
+});
+
+// ---------- section 4 ----------
+const xg=$("xg"),xl=$("xl"),gGrid=[];for(let g=3.5;g<=28.6;g+=0.25)gGrid.push(g);
+const cache={};function curve(L){if(!cache[L])cache[L]=gGrid.map(g=>[g,dev(g,L)]);return cache[L];}
+function s4(){
+  const g=+xg.value,L=LS[+xl.value],d=dev(g,L);
+  $("xgOut").textContent=g+" V⁻¹";$("xlOut").textContent=L+" µm";
+  const fam=key=>LS.map(Lx=>({pts:curve(Lx).map(([gg,q])=>[gg,q[key]]),color:Lx===L?"--accent":"--muted",width:Lx===L?2.6:1,alpha:Lx===L?1:0.45}));
+  const xax={min:3.5,max:28.5,label:"gm/ID (V⁻¹)",n:5};
+  const sortSel=a=>a.sort((p,q)=>(p.color==="--accent")-(q.color==="--accent"));
+  plot($("cIdW"),{x:xax,y:{min:1e-3,max:3e3,log:true,label:"µA/µm",fmt:v=>v>=1?String(v):String(v)},series:sortSel(fam("IdW")),vlines:[{x:g}],points:[{x:g,y:d.IdW,label:eng(d.IdW*1e-6,"A/µm")}]});
+  plot($("cFt"),{x:xax,y:{min:1e6,max:2e11,log:true,label:"Hz",fmt:v=>eng(v,"",1).replace(" ","")},series:sortSel(fam("fT")),vlines:[{x:g}],points:[{x:g,y:d.fT,label:eng(d.fT,"Hz")}]});
+  plot($("cGain"),{x:xax,y:{min:5,max:500,log:true,label:"V/V",fmt:String},series:sortSel(fam("gain")),vlines:[{x:g}],points:[{x:g,y:d.gain,label:fx(d.gain,0)+" ("+fx(20*Math.log10(d.gain),0)+" dB)"}]});
+  const fom=curve(L).map(([gg,q])=>[gg,gg*q.fT/1e9]);let pk=fom[0];fom.forEach(p=>{if(p[1]>pk[1])pk=p;});
+  plot($("cFom"),{x:xax,y:{min:0,max:pk[1]*1.18,label:"GHz/V",n:4,fmt:v=>v>=10?v.toFixed(0):v.toFixed(1)},
+    bands:[{from:3.5,to:dev(10,L)&&gGrid.find(gg=>dev(gg,L).IC<10)||10,color:"--si",label:"SI"},{from:gGrid.find(gg=>dev(gg,L).IC<10)||10,to:gGrid.find(gg=>dev(gg,L).IC<0.1)||24,color:"--mi",label:"MI"},{from:gGrid.find(gg=>dev(gg,L).IC<0.1)||24,to:28.5,color:"--wi",label:"WI"}],
+    series:[{pts:fom,color:"--accent",width:2.6}],vlines:[{x:g}],points:[{x:pk[0],y:pk[1],label:"peak @ "+fx(pk[0],1),color:"--mi"},{x:g,y:g*d.fT/1e9}]});
+  $("r4Reg").innerHTML=regionHTML(d.IC);$("r4IC").textContent=icFmt(d.IC);$("r4IdW").textContent=eng(d.IdW*1e-6,"A/µm");
+  $("r4Ft").textContent=eng(d.fT,"Hz");$("r4Gain").textContent=fx(d.gain,0)+" V/V";$("r4Vd").textContent=fx(2000/g,0)+" mV";
+}
+[xg,xl].forEach(e=>e.addEventListener("input",s4));
+["cIdW","cFt","cGain","cFom"].forEach(id=>bindDrag($(id),v=>{xg.value=Math.round(Math.min(28,Math.max(4,v))*2)/2;s4();}));
+
+// ---------- section 7 ----------
+const eg=$("eg"),el=$("el");
+function s7(){
+  const gbw=Math.max(1e-3,+$("eGbw").value||50)*1e6,cl=Math.max(1e-3,+$("eCl").value||1)*1e-12,vdd=+$("eVdd").value||1.8;
+  const g=+eg.value,L=LS[+el.value],d=dev(g,L),gm=2*Math.PI*gbw*cl,Id=gm/g,W=Id/d.IdW; // W in m
+  const Cg=d.CggW*W,ratio=d.fT/gbw,av=d.gain/2;
+  $("egOut").textContent=g+" V⁻¹";$("elOut").textContent=L+" µm";
+  $("eGm").textContent=eng(gm,"S");$("eId").textContent=eng(Id,"A");$("eTail").textContent=eng(2*Id,"A");
+  const Wum=W*1e6;$("eW").textContent=(Wum>=1000?fx(Wum/1000,2)+" mm":Wum>=10?fx(Wum,1)+" µm":fx(Wum,2)+" µm");
+  $("eC").textContent=eng(Cg,"F");$("eRatio").textContent=fx(ratio,ratio<10?1:0)+"×";
+  $("eAv").textContent=fx(av,0)+" V/V ("+fx(20*Math.log10(av),0)+" dB)";$("eP").textContent=eng(2*Id*vdd,"W");
+  const n=$("eNote");let msg,cls="ok";
+  if(ratio<10){cls="warn";msg="f<sub>T</sub> is only "+fx(ratio,1)+"× GBW. Parasitic poles will erode phase margin: lower g<sub>m</sub>/I<sub>D</sub> or shorten L.";}
+  else if(g>23){cls="warn";msg="Deep weak inversion: you save little more current while W and C<sub>gg</sub> keep growing ("+eng(Cg,"F")+" on each input). Check what drives this gate.";}
+  else if(Wum<0.4){cls="warn";msg="W is near or below a typical minimum width. Raise g<sub>m</sub>/I<sub>D</sub> or lengthen L so the device is drawable.";}
+  else if(g<7){msg="Fast and compact, but power is high: you could raise g<sub>m</sub>/I<sub>D</sub> and still keep f<sub>T</sub>/GBW = "+fx(ratio,0)+"× comfortably above 10.";}
+  else msg="Reasonable design point: f<sub>T</sub> is "+fx(ratio,0)+"× GBW and the pair burns "+eng(2*Id*vdd,"W")+".";
+  n.className="note "+cls;n.innerHTML=msg;
+  const sw=gGrid.filter(x=>x>=4&&x<=27.5).map(x=>{const q=dev(x,L),I=gm/x;return[x,I*1e6,I/q.IdW*1e6];});
+  plot($("cEx"),{tall:true,x:{min:4,max:27.5,label:"Input pair gm/ID (V⁻¹)",n:6},y:{min:0.1,max:1e4,log:true,label:"value",fmt:v=>v>=1?String(v):String(v)},
+    series:[{pts:sw.map(p=>[p[0],p[1]]),color:"--accent",width:2.4,label:"ID per side (µA)"},{pts:sw.map(p=>[p[0],p[2]]),color:"--si",width:2.4,label:"W (µm)"}],
+    vlines:[{x:g}],points:[{x:g,y:Id*1e6,label:fx(Id*1e6,1)+" µA"},{x:g,y:Wum,label:fx(Wum,1)+" µm",color:"--si"}]});
+}
+[eg,el].forEach(e=>e.addEventListener("input",s7));["eGbw","eCl","eVdd"].forEach(id=>$(id).addEventListener("input",s7));
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{eg.value=b.dataset.g;s7();}));
+bindDrag($("cEx"),v=>{eg.value=Math.round(Math.min(27,Math.max(4,v))*2)/2;s7();});
+
+// ---------- schematic ----------
+(function(){
+  const base='<path class="w" d="M-28 0H-12M-12 -13V13M-6 -16V16M-6 -11H12V-30M-6 11H12V30"/>';
+  function mos(cx,cy,o){const sx=o.flip?-1:1,sy=o.p?-1:1;let s='<g transform="translate('+cx+' '+cy+') scale('+sx+' '+sy+')"'+(o.hl?' class="hlg"':'')+'>'+(o.hl?base.replace('class="w"','class="w hl"'):base);if(o.p)s+='<circle class="bub" cx="-15.5" cy="0" r="3"/>';return s+"</g>";}
+  let s="";
+  s+='<path class="w" d="M90 40H270"/><text x="276" y="44">VDD</text>';
+  s+=mos(144,70,{p:true,flip:true})+mos(216,70,{p:true});
+  s+='<path class="w" d="M172 70H188M180 70V112H132M132 100V130M228 100V130M228 115H330V178M318 178H342M318 186H342M330 186V280M132 190V200H228V190M180 200V210M180 270V280M150 280H342"/>';
+  s+=mos(120,160,{hl:true})+mos(240,160,{flip:true,hl:true})+mos(168,240,{});
+  s+='<path class="w" d="M180 276V280"/>';
+  s+='<circle class="dot" cx="180" cy="112" r="2.6"/><circle class="dot" cx="228" cy="115" r="2.6"/><circle class="dot" cx="180" cy="200" r="2.6"/><circle class="dot" cx="180" cy="70" r="2.6"/>';
+  s+='<text x="88" y="164" text-anchor="end" class="hlt">Vin+</text><text x="272" y="164" class="hlt">Vin−</text>';
+  s+='<text x="136" y="245" text-anchor="end">Vb</text><text x="326" y="108" text-anchor="end">Vout</text><text x="348" y="186">CL</text>';
+  s+='<text x="104" y="66" class="lab" text-anchor="end">M3</text><text x="256" y="66" class="lab">M4</text>';
+  s+='<text x="146" y="152" class="hlt">M1</text><text x="200" y="152" class="hlt" text-anchor="end">M2</text>';
+  s+='<text x="196" y="244" class="lab">M5</text>';
+  s+='<text x="246" y="296" class="lab" text-anchor="middle">GND</text>';
+  $("ota").innerHTML=s;
+})();
+
+reg(s2);reg(s4);reg(s7);
+let rt;const ro=new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(redrawAll,60);});ro.observe(document.querySelector("main"));
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",redrawAll);}catch(e){}
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme","class"]});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(redrawAll);
+})();
+</script>
+
+</body></html>

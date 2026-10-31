@@ -1,0 +1,46 @@
+{{- /* An interactive post: a self-contained HTML page (charts, sliders, simulations…) kept in the
+       post's folder and shown inside the site in a frame that grows to fit it.
+       The page is picked by `html:` in the front matter, or is the only .html file in the folder. */ -}}
+{{- define "main" }}
+{{- $page := .Resources.GetMatch (.Params.html | default "*.html") }}
+{{- if not $page }}{{ warnf "Interactive post %q has no HTML page next to its index.md (looked for %q)." .File.Path (.Params.html | default "*.html") }}{{ end }}
+<article class="interactive-post">
+  <header class="interactive-header wrap">
+    <p class="crumbs"><a href="{{ "/interactive/" | relURL }}">Interactive posts</a></p>
+    <div class="interactive-head-row">
+      <div class="interactive-head-text">
+        <h1 class="interactive-title">{{ .Title }}{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h1>
+        {{- partial "post-meta.html" . }}
+      </div>
+      {{- with $page }}
+      <a class="btn interactive-open" href="{{ .RelPermalink }}" target="_blank" rel="noopener">Open full page {{ partial "icon.html" "link" }}</a>
+      {{- end }}
+    </div>
+    {{- partial "tags.html" . }}
+  </header>
+
+  {{- with $page }}
+  {{- $h := "" }}
+  {{- with $.Params.height }}{{ $h = string . }}{{ if findRE `^[0-9.]+$` $h }}{{ $h = print $h "px" }}{{ end }}{{ end }}
+  <div class="interactive-frame-wrap wrap">
+    <iframe class="interactive-frame" src="{{ .RelPermalink }}" title="{{ $.Title }}"
+      {{- with $h }} style="{{ printf "height: %s" . | safeCSS }}" data-fixed-height{{ end }}></iframe>
+  </div>
+  {{- else }}
+  <div class="wrap"><p class="empty">The interactive page for this post is missing.</p></div>
+  {{- end }}
+
+  <div class="post-grid">
+    {{- /* Notes written below the front matter; an HTML comment alone (as in the template) doesn't count. */}}
+    {{- with trim (.Content | replaceRE `(?s)<!--.*?-->` "" | string) " \n\r\t" }}
+    <div class="post-body prose interactive-notes">{{ partial "content.html" $ }}</div>
+    {{- end }}
+    <footer class="post-footer">
+      <nav class="post-nav" aria-label="More interactive posts">
+        {{- with .PrevInSection }}<a class="post-nav-link prev" href="{{ .RelPermalink }}"><span class="post-nav-dir">Newer</span><span class="post-nav-title">{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
+        {{- with .NextInSection }}<a class="post-nav-link next" href="{{ .RelPermalink }}"><span class="post-nav-dir">Older</span><span class="post-nav-title">{{ .Title }}</span></a>{{ end }}
+      </nav>
+    </footer>
+  </div>
+</article>
+{{- end }}

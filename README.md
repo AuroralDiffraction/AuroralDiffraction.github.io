@@ -14,6 +14,9 @@ hugo                  # build the public site into ./public
 
 ## Write a blog post
 
+> **Step-by-step guide:** [ADDING-POSTS.md](ADDING-POSTS.md) covers Markdown posts, HTML inside
+> posts, and interactive posts made from complete HTML pages.
+
 ```bash
 hugo new content blog/my-post.md
 ```
@@ -94,6 +97,21 @@ Supported types: `book`, `article-journal`, `paper-conference`, `chapter`, `thes
 `webpage`. A key that isn't found shows as a red **?key** and `hugo` prints a warning.
 Citations inside code are left alone.
 
+## Add an interactive post
+
+A complete, self-contained HTML page (live plots, sliders, simulations) goes in its own folder in
+`content/interactive/`, next to an `index.md` with the title, date and tags:
+
+```
+content/interactive/gm-id-method/
+├── index.md       title, date, description, tags, html: "page.html"
+└── page.html      the page, unchanged
+```
+
+`hugo new content interactive/my-demo/index.md` creates the `index.md`. The page is shown inside the
+site in a frame that grows to its height and passes on the light/dark theme. Details are in
+[ADDING-POSTS.md](ADDING-POSTS.md#2b-a-complete-html-page--an-interactive-post).
+
 ## Add a project
 
 ```bash
@@ -133,12 +151,13 @@ cover:
 ```
 config.yml                  site settings, menu, hero text, social links
 content/blog/               blog posts (Markdown)
+content/interactive/        interactive posts (index.md + a self-contained HTML page)
 content/projects/           projects (Markdown)
 content/about.md            about page
 archetypes/                 templates used by `hugo new`
 static/                     files copied as-is (images, favicons)
 themes/auroral/
-  layouts/                  HTML templates
+  layouts/                  HTML templates (layouts/interactive/ frames the HTML pages)
   assets/css/main.css       all styles; colours are CSS variables at the top
   assets/js/background.js   the animated aurora + circuit background
   assets/js/site.js         theme toggle, copy buttons, contents sidebar, citation previews

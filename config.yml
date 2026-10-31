@@ -27,12 +27,21 @@ outputs:
 taxonomies:
   tag: tags
 
+# Only Markdown files in content/ become pages. Any .html file there is published unchanged,
+# which is how interactive posts work: content/interactive/<name>/page.html is shown in a frame.
+contentTypes:
+  text/markdown: {}
+
 menu:
   main:
     - identifier: blog
       name: Blog
       url: /blog/
       weight: 10
+    - identifier: interactive
+      name: Interactive
+      url: /interactive/
+      weight: 15
     - identifier: projects
       name: Projects
       url: /projects/

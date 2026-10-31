@@ -1,13 +1,19 @@
 {{- $items := slice }}
-{{- range where site.RegularPages "Section" "in" (slice "blog" "projects") }}
+{{- range where site.RegularPages "Section" "in" (slice "blog" "interactive" "projects") }}
+{{- $text := .Plain }}
+{{- /* Interactive posts: search the text of the embedded HTML page too. */}}
+{{- if eq .Section "interactive" }}{{ with .Resources.GetMatch (.Params.html | default "*.html") }}
+{{- $body := .Content | replaceRE `(?is)<(script|style)\b.*?</(script|style)>|<!doctype[^>]*>` " " | plainify | replaceRE `\s+` " " }}
+{{- $text = printf "%s %s" $text $body }}
+{{- end }}{{ end }}
 {{- $items = $items | append (dict
   "title" .Title
   "url" .RelPermalink
-  "section" (cond (eq .Section "blog") "Post" "Project")
+  "section" (cond (eq .Section "blog") "Post" (cond (eq .Section "interactive") "Interactive" "Project"))
   "date" (cond .Date.IsZero "" (.Date.Format "2 Jan 2006"))
   "summary" (.Description | default .Summary | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 220 | htmlUnescape)
   "tags" (.Params.tags | default slice)
-  "content" (.Plain | htmlUnescape | truncate 5000 | htmlUnescape)
+  "content" ($text | htmlUnescape | truncate 5000 | htmlUnescape)
 ) }}
 {{- end }}
 {{- $items | jsonify }}

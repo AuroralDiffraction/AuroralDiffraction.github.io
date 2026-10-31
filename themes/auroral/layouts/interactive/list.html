@@ -1,0 +1,25 @@
+{{- define "main" }}
+{{- partial "page-header.html" . }}
+<div class="wrap">
+  {{- with .Content }}<div class="prose list-intro">{{ . }}</div>{{ end }}
+  {{- $tags := slice }}
+  {{- range .RegularPages }}{{ range .GetTerms "tags" }}{{ $tags = $tags | append . }}{{ end }}{{ end }}
+  {{- with $tags | uniq }}
+  <nav class="tag-filter" aria-label="Browse by tag">
+    <ul class="tags">
+      {{- range sort . "LinkTitle" }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }} <span class="count">{{ len .Pages }}</span></a></li>{{ end }}
+    </ul>
+  </nav>
+  {{- end }}
+  {{- range .RegularPages.GroupByDate "2006" }}
+  <section class="year-group" aria-labelledby="y-{{ .Key }}">
+    <h2 class="year" id="y-{{ .Key }}">{{ .Key }}</h2>
+    <div class="post-list">
+      {{- range .Pages }}{{ partial "post-row.html" . }}{{ end }}
+    </div>
+  </section>
+  {{- else }}
+  <p class="empty">No interactive posts yet. Add a folder with an <code>index.md</code> and an HTML page to <code>content/interactive/</code> and it will appear here.</p>
+  {{- end }}
+</div>
+{{- end }}

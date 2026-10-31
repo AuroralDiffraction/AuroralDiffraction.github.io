@@ -23,7 +23,7 @@
 <section class="wrap home-content prose">{{ . }}</section>
 {{- end }}
 
-{{- $posts := where site.RegularPages "Section" "blog" }}
+{{- $posts := where site.RegularPages "Section" "in" (slice "blog" "interactive") }}
 <section class="wrap home-section" aria-labelledby="latest">
   <div class="section-head">
     <h2 id="latest">Latest writing</h2>

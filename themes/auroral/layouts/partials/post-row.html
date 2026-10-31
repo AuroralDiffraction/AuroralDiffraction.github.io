@@ -2,7 +2,7 @@
 <article class="post-row">
   <time class="post-row-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "2 Jan" }}<span class="post-row-year">{{ .Date.Format "2006" }}</span></time>
   <div class="post-row-body">
-    <h3 class="post-row-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h3>
+    <h3 class="post-row-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ if eq .Section "interactive" }} <span class="badge badge-interactive">Interactive</span>{{ end }}{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h3>
     {{- with .Description | default .Summary }}<p class="post-row-summary">{{ . | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 200 }}</p>{{ end }}
     {{- partial "tags.html" . }}
   </div>

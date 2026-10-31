@@ -129,6 +129,49 @@
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") pop.hidden = true; });
   }
 
+  // ----- interactive posts: fit the frame to its page and pass the colour theme on -----
+  document.querySelectorAll("iframe.interactive-frame").forEach((frame) => {
+    const fixed = frame.hasAttribute("data-fixed-height");
+    let stop = () => {};
+    const setup = () => {
+      stop();
+      let doc;
+      try { doc = frame.contentDocument; } catch (e) { return; } // page on another site: leave it alone
+      if (!doc || !doc.documentElement) return;
+      const html = doc.documentElement;
+
+      // Pages that style :root[data-theme="dark"|"light"] follow the site's theme toggle.
+      const syncTheme = () => html.setAttribute("data-theme", root.getAttribute("data-theme") || "dark");
+      syncTheme();
+      const themeWatch = new MutationObserver(syncTheme);
+      themeWatch.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+      // Links that leave the page open in the whole window, not inside the frame.
+      doc.addEventListener("click", (e) => {
+        const a = e.target.closest && e.target.closest("a[href]");
+        if (!a || a.target) return;
+        const samePage = a.origin === doc.location.origin && a.pathname === doc.location.pathname && a.search === doc.location.search;
+        if (!samePage) a.target = "_top";
+      });
+
+      let sizeWatch = null;
+      if (!fixed) {
+        const fit = () => {
+          const h = Math.ceil(Math.max(html.offsetHeight, doc.body ? doc.body.scrollHeight : 0));
+          if (h > 0 && Math.abs(h - frame.clientHeight) > 1) frame.style.height = h + 2 + "px"; // +2: frame border
+        };
+        fit();
+        sizeWatch = new ResizeObserver(fit);
+        sizeWatch.observe(html);
+        if (doc.body) sizeWatch.observe(doc.body);
+      }
+      stop = () => { themeWatch.disconnect(); sizeWatch?.disconnect(); };
+    };
+    frame.addEventListener("load", setup);
+    // The frame may have finished loading before this script ran.
+    try { if (frame.contentDocument?.readyState === "complete" && frame.contentDocument.URL !== "about:blank") setup(); } catch (e) {}
+  });
+
   // ----- hero title: colour fringes follow the pointer a little -----
   const title = document.querySelector(".hero-title");
   const fine = window.matchMedia("(pointer: fine)").matches;
