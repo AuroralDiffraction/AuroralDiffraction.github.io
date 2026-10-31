@@ -1,0 +1,4 @@
+{{- with .Params.cover }}{{ with .image }}
+{{- $src := . }}{{ with $.Resources.GetMatch . }}{{ $src = .RelPermalink }}{{ else }}{{ $src = $src | relURL }}{{ end }}
+<figure class="post-cover"><img src="{{ $src }}" alt="{{ $.Params.cover.alt }}">{{ with $.Params.cover.caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>
+{{- end }}{{ end }}

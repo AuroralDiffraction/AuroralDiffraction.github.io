@@ -1,0 +1,86 @@
+{{- /*
+  Returns the page's rendered content, with Pandoc-style citations turned into
+  numbered IEEE-style links and a reference list appended.
+
+    [@razavi2017]              ->  [1]
+    [@razavi2017, p. 45]       ->  [1, p. 45]
+    [@sansen2006; @gray2009]   ->  [2, 3]
+
+  References are looked up (in this order) in the page's front matter
+  `references:`, a `references.json` / `references.yaml` file in the page bundle,
+  and the site-wide `data/references.*` (e.g. a CSL JSON export from Zotero).
+  Citations inside code blocks and inline code are left alone.
+*/ -}}
+{{- $page := . }}
+{{- $html := string .Content }}
+{{- if strings.Contains $html "[@" }}
+
+{{- /* 1. Protect code so "[@x]" inside examples is not touched. */}}
+{{- $codes := findRE `(?s)<pre[\s>].*?</pre>|<code[\s>].*?</code>` $html }}
+{{- range $i, $c := $codes }}{{ $html = replace $html $c (printf "@@CITECODE%d@@" $i) }}{{ end }}
+
+{{- /* 2. Parse every distinct citation group, keeping keys in order of first use. */}}
+{{- $groups := slice }}
+{{- $order := slice }}
+{{- range findRE `\[@[^\[\]]+\]` $html | uniq }}
+  {{- $m := . }}
+  {{- $inner := strings.TrimSuffix "]" (strings.TrimPrefix "[" $m) }}
+  {{- $items := slice }}
+  {{- $ok := true }}
+  {{- range split $inner ";" }}
+    {{- $part := trim . " \n\t" }}
+    {{- $k := findRE `^@[^\s,;]+` $part 1 }}
+    {{- if $k }}
+      {{- $key := strings.TrimPrefix "@" (index $k 0) }}
+      {{- $loc := trim (strings.TrimPrefix (index $k 0) $part) " ,\n\t" }}
+      {{- $items = $items | append (dict "key" $key "loc" $loc) }}
+      {{- if not (in $order $key) }}{{ $order = $order | append $key }}{{ end }}
+    {{- else }}
+      {{- $ok = false }}
+    {{- end }}
+  {{- end }}
+  {{- if and $ok $items }}{{ $groups = $groups | append (dict "match" $m "items" $items) }}{{ end }}
+{{- end }}
+
+{{- /* 3. Resolve keys against the reference library. */}}
+{{- $lib := partial "cite/library.html" $page }}
+{{- $found := slice }}
+{{- range $order }}
+  {{- $key := . }}
+  {{- $e := index (where $lib "id" $key | append (dict)) 0 }}
+  {{- if $e.id }}
+    {{- $found = $found | append (dict "key" $key "entry" $e) }}
+  {{- else }}
+    {{- warnf "%s: no reference found for citation key %q (add it to the front matter `references:` or data/references)" $page.RelPermalink $key }}
+  {{- end }}
+{{- end }}
+
+{{- /* 4. Replace each citation group with numbered links. */}}
+{{- range $groups }}
+  {{- $parts := slice }}
+  {{- range .items }}
+    {{- $key := .key }}
+    {{- $n := 0 }}
+    {{- range $i, $f := $found }}{{ if eq $f.key $key }}{{ $n = add $i 1 }}{{ end }}{{ end }}
+    {{- if $n }}
+      {{- $parts = $parts | append (printf `<a class="cite-ref" href="#ref-%s">%d</a>%s` (anchorize $key) $n (cond (ne .loc "") (printf ", %s" .loc) "")) }}
+    {{- else }}
+      {{- $parts = $parts | append (printf `<span class="cite-missing" title="No reference with this key">?%s</span>` (htmlEscape $key)) }}
+    {{- end }}
+  {{- end }}
+  {{- $html = replace $html .match (printf `<span class="cite">[%s]</span>` (delimit $parts ", ")) }}
+{{- end }}
+
+{{- /* 5. Put the code back. */}}
+{{- range $i, $c := $codes }}{{ $html = replace $html (printf "@@CITECODE%d@@" $i) $c }}{{ end }}
+
+{{- /* 6. Reference list. */}}
+{{- with $found }}
+  {{- $list := slice }}
+  {{- range $i, $f := . }}
+    {{- $list = $list | append (printf `<li id="ref-%s"><span class="ref-num">[%d]</span><span class="ref-body">%s</span></li>` (anchorize $f.key) (add $i 1) (partial "cite/format.html" $f.entry)) }}
+  {{- end }}
+  {{- $html = printf "%s\n<section class=\"references\" id=\"cite-references\" aria-labelledby=\"cite-references-h\">\n<h2 id=\"cite-references-h\">References</h2>\n<ol>%s</ol>\n</section>" $html (delimit $list "\n") }}
+{{- end }}
+{{- end }}{{/* if the content has citations */}}
+{{- return ($html | safeHTML) }}

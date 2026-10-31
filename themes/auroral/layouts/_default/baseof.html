@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="{{ site.Language.Lang | default "en" }}" data-theme="{{ with site.Params.defaultTheme }}{{ if eq . "light" }}light{{ else }}dark{{ end }}{{ else }}dark{{ end }}">
+<head>
+  {{- partial "head.html" . }}
+</head>
+<body class="kind-{{ .Kind }} section-{{ .Section | default "root" }}{{ if .IsHome }} is-home{{ end }}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  {{- if ne site.Params.background false }}
+  <canvas id="sky" class="sky" aria-hidden="true"></canvas>
+  <div class="sky-veil" aria-hidden="true"></div>
+  {{- end }}
+  {{- partial "header.html" . }}
+  <main id="main" class="main">
+    {{- block "main" . }}{{ end }}
+  </main>
+  {{- partial "footer.html" . }}
+  {{- partial "scripts.html" . }}
+</body>
+</html>

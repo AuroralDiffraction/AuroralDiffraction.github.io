@@ -1,0 +1,20 @@
+{{- /* Generated cover for projects without an image: a waveform seeded from the title,
+       so every project gets its own distinct trace. */ -}}
+{{- $seed := hash.FNV32a .Title }}
+{{- $f1 := add 2 (mod $seed 5) }}
+{{- $f2 := add 5 (mod (div $seed 7) 9) }}
+{{- $ph := mod (div $seed 13) 628 }}
+{{- $pts := slice }}
+{{- range $i := seq 0 80 }}
+  {{- $x := mul $i 5.0 }}
+  {{- $t := div (mul $i 1.0) 80.0 }}
+  {{- $y := add 60.0 (add (mul 28.0 (math.Sin (add (mul $t (mul $f1 6.283)) (div $ph 100.0)))) (mul 9.0 (math.Sin (mul $t (mul $f2 6.283))))) }}
+  {{- $pts = $pts | append (printf "%.1f,%.1f" $x $y) }}
+{{- end }}
+<svg viewBox="0 0 400 120" preserveAspectRatio="none" focusable="false">
+  <defs>
+    <pattern id="g-{{ $seed }}" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".12"/></pattern>
+  </defs>
+  <rect width="400" height="120" fill="url(#g-{{ $seed }})"/>
+  <polyline points="{{ delimit $pts " " }}" fill="none" class="plot-trace" stroke-width="2" vector-effect="non-scaling-stroke"/>
+</svg>

@@ -1,0 +1,4 @@
+<header class="page-header wrap">
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{- with .Description }}<p class="page-lede">{{ . | markdownify }}</p>{{ end }}
+</header>

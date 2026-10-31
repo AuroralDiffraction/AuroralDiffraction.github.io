@@ -1,0 +1,16 @@
+{{- define "main" }}
+<article class="about wrap">
+  <aside class="about-card">
+    {{- $img := .Params.image | default site.Params.hero.image }}
+    {{- with $img }}<img class="about-photo" src="{{ . | relURL }}" alt="Portrait of {{ site.Params.author | default site.Title }}" width="220" height="220">{{ end }}
+    <p class="about-name">{{ site.Params.hero.title | default site.Title }}</p>
+    {{- with site.Params.hero.subtitle }}<p class="about-role">{{ . }}</p>{{ end }}
+    {{- partial "social.html" . }}
+  </aside>
+  <div class="about-main">
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{- with .Description }}<p class="page-lede">{{ . | markdownify }}</p>{{ end }}
+    <div class="prose">{{ partial "content.html" . }}</div>
+  </div>
+</article>
+{{- end }}

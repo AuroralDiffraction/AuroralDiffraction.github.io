@@ -1,0 +1,111 @@
+baseURL: "https://auroraldiffraction.github.io/"
+languageCode: en-us
+title: Auroral Diffraction
+
+# Custom theme living in themes/auroral.
+# The earlier PaperMod version of the site is in the git history (commit 42c67e0).
+theme: "auroral"
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableGitInfo: false
+
+# Keep processed images in Hugo's cache dir (cached between GitHub Actions runs).
+caches:
+  images:
+    dir: :cacheDir/images
+
+minify:
+  disableXML: true
+  minifyOutput: true
+
+outputs:
+  home: [HTML, RSS, JSON] # JSON powers the search page
+
+taxonomies:
+  tag: tags
+
+menu:
+  main:
+    - identifier: blog
+      name: Blog
+      url: /blog/
+      weight: 10
+    - identifier: projects
+      name: Projects
+      url: /projects/
+      weight: 20
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 30
+
+params:
+  description: "Auroral Diffraction writes about analog circuits, chip design and hardware."
+  author: "AuroralDiffraction"
+  dateFormat: "2 January 2006"
+  defaultTheme: dark   # dark | light | auto (follows the visitor's system)
+  images: ["/images/profile/profilePic.jpg"] # default social-preview image
+
+  # Animated aurora + circuit background. Set to false to turn it off site-wide.
+  background: true
+
+  # Load KaTeX on every post. Leave false and set `math: true` in a post's front matter instead.
+  math: false
+
+  hero:
+    title: "Auroral Diffraction"
+    subtitle: "Analog circuit design"
+    intro: "Notes on analog and mixed-signal circuits, chip design and the hardware around them."
+    image: "/images/profile/profilePic.jpg"
+    buttons:
+      - name: Read the blog
+        url: /blog/
+      - name: See projects
+        url: /projects/
+
+  # How many items the home page shows.
+  homeRecentPosts: 5
+  homeFeaturedProjects: 4
+
+  social:
+    - name: github
+      url: "https://github.com/AuroralDiffraction"
+    - name: twitter
+      url: "https://twitter.com/Tanatonium"
+    # - name: linkedin
+    #   url: "https://www.linkedin.com/in/<you>/"
+    # - name: email
+    #   url: "mailto:you@example.com"
+    - name: rss
+      url: "/index.xml"
+
+  favicon:
+    ico: "/favicon/favicon.ico"
+    png16: "/favicon/favicon-16x16.png"
+    png32: "/favicon/favicon-32x32.png"
+    appleTouch: "/favicon/apple-touch-icon.png"
+    manifest: "/favicon/site.webmanifest"
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true # allow raw HTML inside Markdown
+    parser:
+      wrapStandAloneImageWithinParagraph: false # images on their own line become proper <figure>s
+    extensions:
+      passthrough:
+        enable: true
+        delimiters:
+          block: [["\\[", "\\]"], ["$$", "$$"]]
+          inline: [["\\(", "\\)"], ["$", "$"]]
+  highlight:
+    noClasses: false
+    codeFences: true
+    guessSyntax: false
+    lineNos: false
+  tableOfContents:
+    startLevel: 2
+    endLevel: 3

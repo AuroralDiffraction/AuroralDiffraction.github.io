@@ -1,0 +1,12 @@
+{{- /* Images: resolves page-bundle files, adds lazy loading and an optional caption from the title. */ -}}
+{{- $src := .Destination }}
+{{- $w := 0 }}{{ $h := 0 }}
+{{- with .Page.Resources.GetMatch .Destination }}{{ $src = .RelPermalink }}{{ if ne .MediaType.SubType "svg" }}{{ $w = .Width }}{{ $h = .Height }}{{ end }}{{ else }}{{ if hasPrefix $src "/" }}{{ $src = $src | relURL }}{{ end }}{{ end }}
+{{- if .Title }}
+<figure class="figure">
+  <img src="{{ $src }}" alt="{{ .Text }}" loading="lazy" decoding="async"{{ if $w }} width="{{ $w }}" height="{{ $h }}"{{ end }}>
+  <figcaption>{{ .Title | markdownify }}</figcaption>
+</figure>
+{{- else -}}
+<img src="{{ $src }}" alt="{{ .Text }}" loading="lazy" decoding="async"{{ if $w }} width="{{ $w }}" height="{{ $h }}"{{ end }}>
+{{- end -}}

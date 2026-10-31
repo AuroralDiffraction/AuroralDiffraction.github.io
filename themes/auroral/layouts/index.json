@@ -1,0 +1,13 @@
+{{- $items := slice }}
+{{- range where site.RegularPages "Section" "in" (slice "blog" "projects") }}
+{{- $items = $items | append (dict
+  "title" .Title
+  "url" .RelPermalink
+  "section" (cond (eq .Section "blog") "Post" "Project")
+  "date" (cond .Date.IsZero "" (.Date.Format "2 Jan 2006"))
+  "summary" (.Description | default .Summary | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 220 | htmlUnescape)
+  "tags" (.Params.tags | default slice)
+  "content" (.Plain | htmlUnescape | truncate 5000 | htmlUnescape)
+) }}
+{{- end }}
+{{- $items | jsonify }}

@@ -1,0 +1,4 @@
+name = "Auroral"
+license = "MIT"
+description = "Aurora-over-silicon personal theme: blog, projects and about page."
+min_version = "0.130.0"

@@ -1,0 +1,104 @@
+{{- /* Formats one CSL-style entry in IEEE style. Returns HTML.
+       Understands CSL JSON/YAML (as exported by Zotero) and a few simple aliases:
+       author (list of {family, given} / {literal} / plain strings, or one string),
+       title, container-title (or journal / booktitle), type, volume, issue, page,
+       issued (CSL date or a plain year) or year, edition, publisher, genre, DOI, URL, note. */ -}}
+{{- $e := . }}
+
+{{- /* authors */}}
+{{- $names := slice }}
+{{- with $e.author }}
+  {{- $list := cond (reflect.IsSlice .) . (slice .) }}
+  {{- range $list }}
+    {{- if reflect.IsMap . }}
+      {{- if .literal }}{{ $names = $names | append (htmlEscape .literal) }}
+      {{- else }}
+        {{- $ini := slice }}
+        {{- range split (string (.given | default "")) " " }}
+          {{- if strings.Contains . "." }}
+            {{- /* already initials, e.g. "R.H." -> "R. H." */}}
+            {{- range split . "." }}{{ with trim . " " }}{{ $ini = $ini | append (printf "%s." .) }}{{ end }}{{ end }}
+          {{- else if . }}
+            {{- /* full names, e.g. "Jean-Pierre" -> "J.-P." */}}
+            {{- $sub := slice }}
+            {{- range split . "-" }}{{ if . }}{{ $sub = $sub | append (printf "%s." (substr . 0 1)) }}{{ end }}{{ end }}
+            {{- $ini = $ini | append (delimit $sub "-") }}
+          {{- end }}
+        {{- end }}
+        {{- $names = $names | append (htmlEscape (trim (printf "%s %s" (delimit $ini " ") (string (.family | default ""))) " ")) }}
+      {{- end }}
+    {{- else }}{{ $names = $names | append (htmlEscape (string .)) }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- $authors := "" }}
+{{- $n := len $names }}
+{{- if eq $n 1 }}{{ $authors = index $names 0 }}
+{{- else if eq $n 2 }}{{ $authors = printf "%s and %s" (index $names 0) (index $names 1) }}
+{{- else if and (gt $n 2) (le $n 6) }}{{ $authors = printf "%s, and %s" (delimit (first (sub $n 1) $names) ", ") (index $names (sub $n 1)) }}
+{{- else if gt $n 6 }}{{ $authors = printf "%s <i>et al.</i>" (index $names 0) }}
+{{- end }}
+
+{{- /* year */}}
+{{- $year := "" }}
+{{- with $e.year }}{{ $year = string . }}{{ end }}
+{{- with $e.issued }}
+  {{- if reflect.IsMap . }}
+    {{- with index . "date-parts" }}{{ with index . 0 }}{{ with index . 0 }}{{ $year = string . }}{{ end }}{{ end }}{{ end }}
+    {{- with .literal }}{{ $year = string . }}{{ end }}
+    {{- with .raw }}{{ $year = string . }}{{ end }}
+  {{- else }}{{ $year = string . }}{{ end }}
+{{- end }}
+
+{{- $type := string ($e.type | default "") }}
+{{- $title := string ($e.title | default "") | htmlEscape }}
+{{- $container := string (index $e "container-title" | default $e.journal | default $e.booktitle | default "") | htmlEscape }}
+{{- $publisher := string ($e.publisher | default "") | htmlEscape }}
+{{- $doi := string (index $e "DOI" | default (index $e "doi") | default "") }}
+{{- $url := string (index $e "URL" | default (index $e "url") | default "") }}
+{{- $pages := replace (string ($e.page | default $e.pages | default "")) "-" "–" }}
+
+{{- $parts := slice }}
+{{- with $authors }}{{ $parts = $parts | append (printf "%s," .) }}{{ end }}
+
+{{- if and $container (ne $type "book") }}
+  {{- /* article, conference paper, chapter … */}}
+  {{- $parts = $parts | append (printf "“%s,”" $title) }}
+  {{- $c := printf "<i>%s</i>" $container }}
+  {{- if in (slice "paper-conference" "chapter" "entry-encyclopedia") $type }}{{ $c = printf "in %s" $c }}{{ end }}
+  {{- $bits := slice $c }}
+  {{- with $e.volume }}{{ $bits = $bits | append (printf "vol. %v" .) }}{{ end }}
+  {{- with $e.issue }}{{ $bits = $bits | append (printf "no. %v" .) }}{{ end }}
+  {{- with $pages }}{{ $bits = $bits | append (printf "%s %s" (cond (strings.Contains . "–") "pp." "p.") .) }}{{ end }}
+  {{- with $year }}{{ $bits = $bits | append . }}{{ end }}
+  {{- $parts = $parts | append (printf "%s." (delimit $bits ", ")) }}
+{{- else if $title }}
+  {{- /* book, thesis, report, web page */}}
+  {{- if in (slice "thesis" "report" "webpage" "post-weblog" "manuscript") $type }}
+    {{- $parts = $parts | append (printf "“%s,”" $title) }}
+    {{- $bits := slice }}
+    {{- with $e.genre }}{{ $bits = $bits | append (htmlEscape .) }}{{ end }}
+    {{- with $publisher }}{{ $bits = $bits | append . }}{{ end }}
+    {{- with $year }}{{ $bits = $bits | append . }}{{ end }}
+    {{- $parts = $parts | append (printf "%s." (delimit $bits ", ")) }}
+  {{- else }}
+    {{- $t := printf "<i>%s</i>" $title }}
+    {{- with $e.edition }}
+      {{- $ed := string . }}
+      {{- $ed = index (dict "1" "1st" "2" "2nd" "3" "3rd") $ed | default (cond (gt (len (findRE `^\d+$` $ed)) 0) (printf "%sth" $ed) $ed) }}
+      {{- $t = printf "%s, %s ed" $t $ed }}
+    {{- end }}
+    {{- $parts = $parts | append (printf "%s." $t) }}
+    {{- $bits := slice }}
+    {{- with $publisher }}{{ $bits = $bits | append . }}{{ end }}
+    {{- with $year }}{{ $bits = $bits | append . }}{{ end }}
+    {{- with $bits }}{{ $parts = $parts | append (printf "%s." (delimit . ", ")) }}{{ end }}
+  {{- end }}
+{{- end }}
+
+{{- with $e.note }}{{ $parts = $parts | append (printf "%s." (htmlEscape .)) }}{{ end }}
+{{- if $doi }}
+  {{- $parts = $parts | append (printf `doi: <a href="https://doi.org/%s" rel="noopener" target="_blank">%s</a>.` $doi (htmlEscape $doi)) }}
+{{- else if $url }}
+  {{- $parts = $parts | append (printf `[Online]. Available: <a href="%s" rel="noopener" target="_blank">%s</a>` $url (htmlEscape $url)) }}
+{{- end }}
+{{- return (delimit $parts " ") }}

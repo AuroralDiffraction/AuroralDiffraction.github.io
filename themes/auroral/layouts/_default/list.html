@@ -1,0 +1,23 @@
+{{- define "main" }}
+<header class="page-header wrap">
+  {{- if eq .Kind "term" }}<p class="crumbs"><a href="{{ "/tags/" | relURL }}">Tags</a></p>{{ end }}
+  <h1 class="page-title">{{ if eq .Kind "term" }}Tagged “{{ .Title }}”{{ else }}{{ .Title }}{{ end }}</h1>
+  {{- with .Description }}<p class="page-lede">{{ . | markdownify }}</p>{{ end }}
+</header>
+<div class="wrap">
+  {{- with .Content }}<div class="prose list-intro">{{ . }}</div>{{ end }}
+  {{- $posts := where .Pages "Section" "blog" }}
+  {{- $projects := where .Pages "Section" "projects" }}
+  {{- $other := complement $posts $projects .Pages }}
+  {{- with $posts }}
+  <div class="post-list">{{ range .ByDate.Reverse }}{{ partial "post-row.html" . }}{{ end }}</div>
+  {{- end }}
+  {{- with $projects }}
+  <h2 class="year">Projects</h2>
+  <div class="project-grid">{{ range . }}{{ partial "project-card.html" . }}{{ end }}</div>
+  {{- end }}
+  {{- with $other }}
+  <div class="post-list">{{ range . }}{{ partial "post-row.html" . }}{{ end }}</div>
+  {{- end }}
+</div>
+{{- end }}

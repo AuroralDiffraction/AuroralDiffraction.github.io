@@ -1,0 +1,13 @@
+{{- /* Key/value spec table for a circuit or project.
+     {{< specs >}}
+     Process | 65 nm CMOS
+     Supply  | 1.2 V
+     {{< /specs >}} */ -}}
+<dl class="specs">
+{{- range split (trim .Inner "\n ") "\n" }}
+  {{- $kv := split . "|" }}
+  {{- if ge (len $kv) 2 }}
+  <div><dt>{{ trim (index $kv 0) " \t\r" }}</dt><dd>{{ trim (index $kv 1) " \t\r" | markdownify }}</dd></div>
+  {{- end }}
+{{- end }}
+</dl>

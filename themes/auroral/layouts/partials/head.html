@@ -1,0 +1,64 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- $title := cond .IsHome site.Title (printf "%s | %s" .Title site.Title) }}
+<title>{{ $title }}</title>
+{{- $desc := "" }}
+{{- if .IsHome }}{{ $desc = site.Params.description }}{{ else }}{{ $desc = .Description | default .Summary | default site.Params.description }}{{ end }}
+{{- $desc = $desc | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 180 | htmlUnescape }}
+<meta name="description" content="{{ $desc }}">
+<meta name="author" content="{{ site.Params.author }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0a1022">
+
+{{- /* Apply the saved or system theme before first paint to avoid a flash. */}}
+<script>
+  (function () {
+    var d = document.documentElement, pref = "{{ site.Params.defaultTheme | default "dark" }}", saved = null;
+    try { saved = localStorage.getItem("theme"); } catch (e) {}
+    var t = saved || (pref === "auto" ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : pref);
+    d.setAttribute("data-theme", t === "light" ? "light" : "dark");
+  })();
+</script>
+
+{{- with site.Params.favicon }}
+<link rel="icon" href="{{ .ico | relURL }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ .png16 | relURL }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ .png32 | relURL }}">
+<link rel="apple-touch-icon" href="{{ .appleTouch | relURL }}">
+<link rel="manifest" href="{{ .manifest | relURL }}">
+{{- end }}
+
+{{- with .OutputFormats.Get "rss" }}
+<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- else }}{{ with site.Home.OutputFormats.Get "rss" }}
+<link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- end }}{{ end }}
+
+{{- /* Open Graph / Twitter */}}
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+{{- $img := "" }}
+{{- with .Params.cover }}{{ with .image }}{{ $img = . }}{{ end }}{{ end }}
+{{- if not $img }}{{ with site.Params.images }}{{ $img = index . 0 }}{{ end }}{{ end }}
+{{- with $img }}
+<meta property="og:image" content="{{ . | absURL }}">
+<meta name="twitter:card" content="summary_large_image">
+{{- end }}
+{{- if .IsPage }}{{ if not .Date.IsZero }}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}{{ end }}
+
+<link rel="preload" href="{{ "fonts/bricolage-grotesque-latin-opsz-normal.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+
+{{- $fonts := resources.Get "css/fonts.css" }}
+{{- $main := resources.Get "css/main.css" }}
+{{- $syntax := resources.Get "css/syntax.css" }}
+{{- $css := slice $fonts $main $syntax | resources.Concat "css/site.css" }}
+{{- /* Always fingerprint: the file name changes whenever the CSS changes, so browsers never
+       keep showing an old stylesheet (also during local preview). */}}
+{{- if hugo.IsProduction }}{{ $css = $css | minify }}{{ end }}
+{{- $css = $css | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>

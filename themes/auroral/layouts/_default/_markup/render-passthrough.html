@@ -1,0 +1,3 @@
+{{- /* Math is kept as text and typeset by KaTeX in the browser; KaTeX only loads on pages that use it. */ -}}
+{{- .Page.Store.Set "hasMath" true -}}
+{{- if eq .Type "block" }}<div class="math-block">\[{{ .Inner | htmlEscape }}\]</div>{{ else }}<span class="math-inline">\({{ .Inner | htmlEscape }}\)</span>{{ end -}}

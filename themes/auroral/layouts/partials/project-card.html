@@ -1,0 +1,19 @@
+{{- /* Project tile. Context: page. */ -}}
+{{- $cover := "" }}
+{{- with .Params.cover }}{{ with .image }}{{ $cover = . }}{{ end }}{{ end }}
+{{- if $cover }}{{ with $.Resources.GetMatch $cover }}{{ $cover = (.Fill "800x450 Center").RelPermalink }}{{ else }}{{ $cover = $cover | relURL }}{{ end }}{{ end }}
+<article class="project{{ if .Params.featured }} is-featured{{ end }}{{ if $cover }} has-cover{{ end }}">
+  {{- if $cover }}
+  <div class="project-cover"><img src="{{ $cover }}" alt="{{ with .Params.cover.alt }}{{ . }}{{ end }}" loading="lazy" decoding="async"></div>
+  {{- else }}
+  <div class="project-cover project-cover--plot" aria-hidden="true">{{ partial "project-plot.html" . }}</div>
+  {{- end }}
+  <div class="project-body">
+    {{- with .Params.status }}<p class="project-status status-{{ . | urlize }}">{{ . }}</p>{{ end }}
+    <h3 class="project-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h3>
+    {{- with .Description | default .Summary }}<p class="project-summary">{{ . | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 180 }}</p>{{ end }}
+    {{- with .Params.tech }}
+    <ul class="chips" aria-label="Tools and technologies">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
+    {{- end }}
+  </div>
+</article>

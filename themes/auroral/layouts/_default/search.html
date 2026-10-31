@@ -1,0 +1,14 @@
+{{- define "main" }}
+<header class="page-header wrap">
+  <h1 class="page-title">{{ .Title }}</h1>
+</header>
+<div class="wrap"><div class="search">
+  <label class="visually-hidden" for="search-input">Search posts and projects</label>
+  <input id="search-input" class="search-input" type="search" placeholder="{{ .Params.placeholder | default "Search posts and projects" }}" autocomplete="off" autofocus
+    data-index="{{ "index.json" | relURL }}">
+  <p class="search-status" id="search-status" aria-live="polite"></p>
+  <div class="post-list" id="search-results"></div>
+</div></div>
+{{- $js := resources.Get "js/search.js" | js.Build (dict "minify" hugo.IsProduction) | fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>
+{{- end }}

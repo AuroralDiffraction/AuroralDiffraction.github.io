@@ -1,0 +1,15 @@
+{{- /* Table of contents. Context: dict "page" and "content" (the processed content,
+       used to add a "References" entry when the post has citations). */ -}}
+{{- $p := .page }}
+{{- $show := $p.Params.toc | default $p.Params.showToc }}
+{{- if and $show (gt (len $p.TableOfContents) 80) }}
+{{- $toc := string $p.TableOfContents }}
+{{- if strings.Contains (string .content) `id="cite-references"` }}
+  {{- $toc = replaceRE `</ul>\s*</nav>\s*$` "<li><a href=\"#cite-references\">References</a></li></ul></nav>" $toc }}
+{{- end }}
+<details class="toc" open>
+  <summary>Contents</summary>
+  {{ $toc | safeHTML }}
+  <a class="toc-top" href="#main">Back to top</a>
+</details>
+{{- end }}

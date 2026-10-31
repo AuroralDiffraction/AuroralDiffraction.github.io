@@ -1,0 +1,9 @@
+{{- $opts := dict "minify" hugo.IsProduction }}
+{{- $site := resources.Get "js/site.js" | js.Build $opts | fingerprint }}
+<script src="{{ $site.RelPermalink }}" defer></script>
+{{- if ne site.Params.background false }}
+{{- $bg := resources.Get "js/background.js" | js.Build $opts | fingerprint }}
+<script src="{{ $bg.RelPermalink }}" defer></script>
+{{- end }}
+{{- if or .Params.math site.Params.math (.Store.Get "hasMath") }}{{ partial "math.html" . }}{{ end }}
+{{- if .Store.Get "hasMermaid" }}{{ partial "mermaid.html" . }}{{ end }}

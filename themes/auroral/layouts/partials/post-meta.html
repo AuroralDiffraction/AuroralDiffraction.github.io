@@ -1,0 +1,6 @@
+{{- /* Date and reading time for a page. */ -}}
+<p class="meta">
+  {{- if not .Date.IsZero }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format (site.Params.dateFormat | default "2 January 2006") }}</time>{{ end }}
+  {{- if and (eq .Section "blog") .IsPage }}<span class="meta-sep" aria-hidden="true"></span><span>{{ .ReadingTime }} min read</span>{{ end }}
+  {{- if and .Lastmod (gt (.Lastmod.Sub .Date).Hours 48.0) .IsPage }}<span class="meta-sep" aria-hidden="true"></span><span>Updated {{ .Lastmod | time.Format "2 Jan 2006" }}</span>{{ end }}
+</p>

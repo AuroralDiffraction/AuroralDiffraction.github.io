@@ -1,0 +1,9 @@
+{{- with site.Params.social }}
+<ul class="social">
+  {{- range . }}
+  {{- $label := .name | humanize }}
+  {{- if eq .name "twitter" }}{{ $label = "X (Twitter)" }}{{ else if eq .name "rss" }}{{ $label = "RSS feed" }}{{ else if eq .name "github" }}{{ $label = "GitHub" }}{{ else if eq .name "linkedin" }}{{ $label = "LinkedIn" }}{{ end }}
+  <li><a class="icon-btn" href="{{ .url | relURL }}" aria-label="{{ $label }}" title="{{ $label }}"{{ if hasPrefix .url "http" }} rel="me noopener" target="_blank"{{ end }}>{{ partial "icon.html" .name }}</a></li>
+  {{- end }}
+</ul>
+{{- end }}

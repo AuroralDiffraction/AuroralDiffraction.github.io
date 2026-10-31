@@ -1,0 +1,12 @@
+{{- define "main" }}
+{{- partial "page-header.html" . }}
+<div class="wrap">
+  {{- with .Data.Terms.ByCount }}
+  <ul class="tags tags-cloud">
+    {{- range . }}<li><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }} <span class="count">{{ .Count }}</span></a></li>{{ end }}
+  </ul>
+  {{- else }}
+  <p class="empty">No tags yet. Add <code>tags: ["analog", "layout"]</code> to a post's front matter.</p>
+  {{- end }}
+</div>
+{{- end }}

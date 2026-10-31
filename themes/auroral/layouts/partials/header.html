@@ -1,0 +1,25 @@
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="{{ "/" | relURL }}" aria-label="{{ site.Title }}, home">
+      {{- partial "mark.html" . }}
+      <span class="brand-name">{{ site.Title }}</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <ul>
+        {{- $current := . }}
+        {{- range site.Menus.main }}
+        {{- $active := or ($current.IsMenuCurrent "main" .) ($current.HasMenuCurrent "main" .) }}
+        {{- if and (not $active) (ne .URL "/") }}{{ $active = hasPrefix $current.RelPermalink (.URL | relURL) }}{{ end }}
+        <li><a href="{{ .URL | relURL }}"{{ if $active }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+        {{- end }}
+      </ul>
+    </nav>
+    <div class="header-tools">
+      <a class="icon-btn" href="{{ "/search/" | relURL }}" aria-label="Search">{{ partial "icon.html" "search" }}</a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch colour theme">
+        <span class="when-dark">{{ partial "icon.html" "sun" }}</span>
+        <span class="when-light">{{ partial "icon.html" "moon" }}</span>
+      </button>
+    </div>
+  </div>
+</header>
