@@ -8,6 +8,9 @@
 //
 // Respects prefers-reduced-motion (renders one still frame), pauses when the tab is
 // hidden, caps device pixel ratio and frame rate, and scales detail to screen size.
+//
+// Everything that moves is a function of the wall clock, not of time since the page
+// loaded, so moving to another page continues the animation instead of restarting it.
 
 (function () {
   const canvas = document.getElementById("sky");
@@ -36,7 +39,11 @@
   let isLight = false;
   let auroraCanvas, actx, blurCanvas, bctx, glowSprite, raySprites = {};
   let circuitCanvas, routes = [], pulses = [], stars = [];
-  let raf = 0, last = 0, t0 = performance.now(), running = false;
+  let raf = 0, last = 0, running = false;
+  // Seconds on a clock shared by every page of the site (and every tab). Counted from a
+  // recent epoch to keep the numbers small enough for full floating-point precision.
+  const EPOCH = Date.UTC(2026, 0, 1);
+  const clock = (now = performance.now()) => (performance.timeOrigin + now - EPOCH) / 1000;
 
   // ---------- helpers ----------
   function cssVar(name) { return getComputedStyle(root).getPropertyValue(name).trim(); }
@@ -224,7 +231,7 @@
     const count = Math.min(routes.length, Math.round(routes.length * 0.28));
     for (let i = 0; i < count; i++) {
       const rt = routes[Math.floor(rand2() * routes.length)];
-      pulses.push({ rt, pos: rand2() * rt.total, speed: 40 + rand2() * 90, dir: rand2() < 0.5 ? 1 : -1 });
+      pulses.push({ rt, start: rand2() * rt.total, speed: 40 + rand2() * 90, dir: rand2() < 0.5 ? 1 : -1 });
     }
   }
 
@@ -313,17 +320,22 @@
     ctx.restore();
   }
 
-  function drawPulses(dt) {
+  // A pulse runs to the end of its wire and bounces back. Unfolded, that is a triangle
+  // wave, so its position can be worked out directly from the time.
+  function pulseAt(p, t) {
+    const L = p.rt.total, period = 2 * L;
+    let s = (p.start + p.dir * p.speed * t) % period;
+    if (s < 0) s += period;
+    return s <= L ? { pos: s, dir: p.dir } : { pos: period - s, dir: -p.dir };
+  }
+
+  function drawPulses(t) {
     if (!pulses.length) return;
     const { green } = colors;
     ctx.save();
     ctx.globalCompositeOperation = isLight ? "source-over" : "lighter";
-    for (const p of pulses) {
-      p.pos += p.dir * p.speed * dt;
-      if (p.pos > p.rt.total || p.pos < 0) {
-        p.dir *= -1;
-        p.pos = Math.max(0, Math.min(p.rt.total, p.pos));
-      }
+    for (const pulse of pulses) {
+      const p = { rt: pulse.rt, ...pulseAt(pulse, t) };
       const [x, y] = pointOn(p.rt, p.pos);
       const fade = Math.max(0, Math.min(1, (y - H * 0.5) / (H * 0.3)));
       if (fade <= 0) continue;
@@ -343,25 +355,28 @@
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (now - last < 1000 / FPS - 1) return;
-    const dt = Math.min(0.1, (now - (last || now)) / 1000);
     last = now;
-    render((now - t0) / 1000, dt);
+    render(clock(now));
   }
 
-  function render(t, dt) {
+  function render(t) {
     ctx.setTransform(ADPR, 0, 0, ADPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.globalCompositeOperation = "source-over";
     drawStars(t);
     drawAurora(t);
-    drawPulses(dt);
+    drawPulses(t);
   }
+
+  // Still frame for reduced motion.
+  const STILL = 12;
 
   function start() {
     if (running) return;
-    if (reduceMotion.matches) { render(12, 0); return; }
+    if (reduceMotion.matches) { render(STILL); return; }
     running = true;
     last = 0;
+    render(clock()); // draw straight away so a new page never shows an empty sky
     raf = requestAnimationFrame(frame);
   }
   function stop() { running = false; cancelAnimationFrame(raf); }
@@ -381,7 +396,7 @@
       lastW = window.innerWidth; lastH = window.innerHeight;
       resize();
       paintStatic();
-      if (!running) render(12, 0);
+      if (!running) render(STILL);
     }, 150);
   });
 
@@ -393,6 +408,6 @@
     buildSprites();
     buildCircuit();
     paintStatic();
-    if (!running) render(12, 0);
+    if (!running) render(STILL);
   }).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
 })();

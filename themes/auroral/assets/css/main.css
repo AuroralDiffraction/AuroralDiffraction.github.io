@@ -126,6 +126,13 @@ p { margin: 0; }
 body:not(.is-home) .sky { opacity: .55; }
 body:not(.is-home) .sky-veil { opacity: 1; }
 
+/* Going to another page cross-fades instead of flashing (Chrome, Edge, Safari 18.2+;
+   other browsers just load the page as usual). The sky itself carries on smoothly because
+   background.js animates it by the clock rather than restarting on each page. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+
 /* ---------- Header ---------- */
 .site-header {
   position: sticky;
