@@ -10,4 +10,4 @@ aliases: ["/post/about/"]   # keeps the old link working
 
 Welcome to my personal website!
 
-I am AuroralDiffraction, an Analog IC Designer that is currently pursuing a Masters degree in Electrical Engineering at KU Leuven.
+I am AuroralDiffraction, an Analog IC Designer.
