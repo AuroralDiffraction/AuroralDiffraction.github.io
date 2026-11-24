@@ -1,23 +1,26 @@
 {{- define "main" }}
+{{- $isTerm := eq .Kind "term" }}
 <header class="page-header wrap">
-  {{- if eq .Kind "term" }}<p class="crumbs"><a href="{{ "/tags/" | relURL }}">Tags</a></p>{{ end }}
-  <h1 class="page-title">{{ if eq .Kind "term" }}Tagged “{{ .Title }}”{{ else }}{{ .Title }}{{ end }}</h1>
+  {{- if $isTerm }}<p class="crumbs"><a href="{{ partial "i18n/url.html" (printf "/%s/" .Data.Plural) }}">{{ i18n "crumbTags" }}</a></p>{{ end }}
+  <h1 class="page-title">{{ if $isTerm }}{{ i18n "taggedWith" (dict "Title" .Title) }}{{ else }}{{ .Title }}{{ end }}</h1>
   {{- with .Description }}<p class="page-lede">{{ . | markdownify }}</p>{{ end }}
 </header>
 <div class="wrap">
   {{- with .Content }}<div class="prose list-intro">{{ . }}</div>{{ end }}
-  {{- $posts := where .Pages "Section" "blog" }}
-  {{- $projects := where .Pages "Section" "projects" }}
-  {{- $other := complement $posts $projects .Pages }}
+  {{- $all := .Pages }}
+  {{- if $isTerm }}{{ $all = partial "i18n/pages.html" (dict "term" .) }}{{ end }}
+  {{- $posts := where $all "Section" "blog" }}
+  {{- $projects := where $all "Section" "projects" }}
+  {{- $other := complement $posts $projects $all }}
   {{- with $posts }}
-  <div class="post-list">{{ range .ByDate.Reverse }}{{ partial "post-row.html" . }}{{ end }}</div>
+  <div class="post-list">{{ range sort . "Date" "desc" }}{{ partial "post-row.html" . }}{{ end }}</div>
   {{- end }}
   {{- with $projects }}
-  <h2 class="year">Projects</h2>
+  <h2 class="year">{{ i18n "projects" }}</h2>
   <div class="project-grid">{{ range . }}{{ partial "project-card.html" . }}{{ end }}</div>
   {{- end }}
   {{- with $other }}
-  <div class="post-list">{{ range . }}{{ partial "post-row.html" . }}{{ end }}</div>
+  <div class="post-list">{{ range sort . "Date" "desc" }}{{ partial "post-row.html" . }}{{ end }}</div>
   {{- end }}
 </div>
 {{- end }}

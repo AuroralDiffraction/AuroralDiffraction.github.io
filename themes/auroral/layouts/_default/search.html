@@ -3,9 +3,11 @@
   <h1 class="page-title">{{ .Title }}</h1>
 </header>
 <div class="wrap"><div class="search">
-  <label class="visually-hidden" for="search-input">Search posts and projects</label>
-  <input id="search-input" class="search-input" type="search" placeholder="{{ .Params.placeholder | default "Search posts and projects" }}" autocomplete="off" autofocus
-    data-index="{{ "index.json" | relURL }}">
+  <label class="visually-hidden" for="search-input">{{ i18n "searchLabel" }}</label>
+  <input id="search-input" class="search-input" type="search" placeholder="{{ .Params.placeholder | default (i18n "searchLabel") }}" autocomplete="off" autofocus
+    data-index="{{ "index.json" | relLangURL }}"
+    data-i18n-loading="{{ i18n "searchLoading" }}" data-i18n-one="{{ i18n "searchResults" 1 }}" data-i18n-many="{{ i18n "searchResults" 2 }}"
+    data-i18n-nothing="{{ i18n "searchNothing" }}" data-i18n-error="{{ i18n "searchLoadError" }}">
   <p class="search-status" id="search-status" aria-live="polite"></p>
   <div class="post-list" id="search-results"></div>
 </div></div>

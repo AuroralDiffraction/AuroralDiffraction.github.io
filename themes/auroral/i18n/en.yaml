@@ -1,0 +1,90 @@
+# Interface text of the theme in English. Each key has its Chinese counterpart in zh.yaml.
+# In templates: {{ i18n "latestWriting" }}. Text with {{ ... }} receives a value from the template.
+
+# Menu (by the identifier in config.yml)
+menu.blog: "Blog"
+menu.interactive: "Interactive"
+menu.projects: "Projects"
+menu.about: "About"
+
+# Header and footer
+skipToContent: "Skip to content"
+homeLink: "{{ .Title }}, home"
+search: "Search"
+switchTheme: "Switch colour theme"
+mainNav: "Main"
+readIn: "Read in {{ .Language }}"
+tags: "Tags"
+rss: "RSS"
+builtWith: "Built with"
+
+# Home page
+latestWriting: "Latest writing"
+allPosts: "All posts"
+selectedProjects: "Selected projects"
+allProjects: "All projects"
+homeNoPosts: "The first posts on hardware and chip design are on their way."
+portraitOf: "Portrait of {{ .Name }}"
+
+# Lists
+browseByTag: "Browse by tag"
+taggedWith: "Tagged “{{ .Title }}”"
+projects: "Projects"
+emptyBlog: "No posts yet. Add a Markdown file to <code>content/blog/</code> and it will appear here."
+emptyInteractive: "No interactive posts yet. Add a folder with an <code>index.md</code> and an HTML page to <code>content/interactive/</code> and it will appear here."
+emptyProjects: "Projects are on their way. Add one with <code>hugo new projects/my-project.md</code>."
+emptyTags: "No tags yet. Add <code>tags: [\"analog\", \"layout\"]</code> to a post's front matter."
+onlyIn: "Only available in {{ .Language }}"
+
+# Badges
+badgeInteractive: "Interactive"
+badgeDraft: "Draft"
+
+# Posts
+crumbBlog: "Blog"
+crumbInteractive: "Interactive posts"
+crumbProjects: "Projects"
+crumbTags: "Tags"
+readingTime:
+  one: "{{ .Count }} min read"
+  other: "{{ .Count }} min read"
+updated: "Updated {{ .Date }}"
+newer: "Newer"
+older: "Older"
+morePosts: "More posts"
+moreInteractive: "More interactive posts"
+contents: "Contents"
+backToTop: "Back to top"
+references: "References"
+linkToSection: "Link to this section"
+toolsAndTech: "Tools and technologies"
+openFullPage: "Open full page"
+interactiveMissing: "The interactive page for this post is missing."
+copyCode: "Copy code"
+copied: "Copied"
+
+# Translations. {{ .Language }} is the language name, linked to the original post when there is one.
+originalNote: "Originally written in {{ .Language }}."
+lang.en: "English"
+lang.zh: "Chinese"
+
+# Callouts ({{< note type="..." >}})
+callout.note: "Note"
+callout.tip: "Tip"
+callout.warning: "Warning"
+
+# Search
+searchLabel: "Search posts and projects"
+sectionPost: "Post"
+sectionInteractive: "Interactive"
+sectionProject: "Project"
+searchLoading: "Loading…"
+searchResults:
+  one: "{{ .Count }} result"
+  other: "{{ .Count }} results"
+searchNothing: "Nothing matches “{q}”. Try a shorter or different word."
+searchLoadError: "Search couldn't load its index. Reload the page to try again."
+
+# 404
+notFoundTitle: "This page doesn't exist"
+notFoundText: "The link may be old, or the page has moved. Try the <a href=\"{{ .Blog }}\">blog</a>, <a href=\"{{ .Projects }}\">projects</a> or <a href=\"{{ .Search }}\">search</a>."

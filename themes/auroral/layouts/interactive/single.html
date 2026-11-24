@@ -6,14 +6,15 @@
 {{- if not $page }}{{ warnf "Interactive post %q has no HTML page next to its index.md (looked for %q)." .File.Path (.Params.html | default "*.html") }}{{ end }}
 <article class="interactive-post">
   <header class="interactive-header wrap">
-    <p class="crumbs"><a href="{{ "/interactive/" | relURL }}">Interactive posts</a></p>
+    <p class="crumbs"><a href="{{ partial "i18n/url.html" "/interactive/" }}">{{ i18n "crumbInteractive" }}</a></p>
     <div class="interactive-head-row">
       <div class="interactive-head-text">
-        <h1 class="interactive-title">{{ .Title }}{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h1>
+        <h1 class="interactive-title">{{ .Title }}{{ if .Draft }} <span class="badge">{{ i18n "badgeDraft" }}</span>{{ end }}</h1>
         {{- partial "post-meta.html" . }}
+        {{- partial "translation-note.html" . }}
       </div>
       {{- with $page }}
-      <a class="btn interactive-open" href="{{ .RelPermalink }}" target="_blank" rel="noopener">Open full page {{ partial "icon.html" "link" }}</a>
+      <a class="btn interactive-open" href="{{ .RelPermalink }}" target="_blank" rel="noopener">{{ i18n "openFullPage" }} {{ partial "icon.html" "link" }}</a>
       {{- end }}
     </div>
     {{- partial "tags.html" . }}
@@ -27,7 +28,7 @@
       {{- with $h }} style="{{ printf "height: %s" . | safeCSS }}" data-fixed-height{{ end }}></iframe>
   </div>
   {{- else }}
-  <div class="wrap"><p class="empty">The interactive page for this post is missing.</p></div>
+  <div class="wrap"><p class="empty">{{ i18n "interactiveMissing" }}</p></div>
   {{- end }}
 
   <div class="post-grid">
@@ -36,9 +37,9 @@
     <div class="post-body prose interactive-notes">{{ partial "content.html" $ }}</div>
     {{- end }}
     <footer class="post-footer">
-      <nav class="post-nav" aria-label="More interactive posts">
-        {{- with .PrevInSection }}<a class="post-nav-link prev" href="{{ .RelPermalink }}"><span class="post-nav-dir">Newer</span><span class="post-nav-title">{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
-        {{- with .NextInSection }}<a class="post-nav-link next" href="{{ .RelPermalink }}"><span class="post-nav-dir">Older</span><span class="post-nav-title">{{ .Title }}</span></a>{{ end }}
+      <nav class="post-nav" aria-label="{{ i18n "moreInteractive" }}">
+        {{- with .PrevInSection }}<a class="post-nav-link prev" href="{{ .RelPermalink }}"><span class="post-nav-dir">{{ i18n "newer" }}</span><span class="post-nav-title">{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
+        {{- with .NextInSection }}<a class="post-nav-link next" href="{{ .RelPermalink }}"><span class="post-nav-dir">{{ i18n "older" }}</span><span class="post-nav-title">{{ .Title }}</span></a>{{ end }}
       </nav>
     </footer>
   </div>

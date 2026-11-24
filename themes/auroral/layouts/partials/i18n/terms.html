@@ -1,0 +1,25 @@
+{{- /* Tags (or another taxonomy's terms) for the reader's language, including tags that so far only
+       appear on posts in the other language. Each tag links to this language's tag page when there
+       is one. Context: dict with
+         "taxonomy"  default "tags"
+         "pages"     optional: only the terms used by these pages
+       Returns a slice of dicts: page (the term page), count (posts with it, both languages), title. */ -}}
+{{- $tax := .taxonomy | default "tags" }}
+{{- $termPages := slice }}
+{{- if isset . "pages" }}
+  {{- range .pages }}{{ range .GetTerms $tax }}{{ $termPages = $termPages | append . }}{{ end }}{{ end }}
+{{- else }}
+  {{- range site.Sites }}{{ with .GetPage (printf "/%s" $tax) }}{{ range .Pages }}{{ $termPages = $termPages | append . }}{{ end }}{{ end }}{{ end }}
+{{- end }}
+{{- $seen := slice }}
+{{- $out := slice }}
+{{- range $termPages }}
+  {{- if not (in $seen .Path) }}
+    {{- $seen = $seen | append .Path }}
+    {{- $tp := . }}
+    {{- with site.GetPage .Path }}{{ $tp = . }}{{ end }}
+    {{- $n := len (partial "i18n/pages.html" (dict "term" $tp)) }}
+    {{- if $n }}{{ $out = $out | append (dict "page" $tp "count" $n "title" (lower $tp.LinkTitle)) }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- return $out }}

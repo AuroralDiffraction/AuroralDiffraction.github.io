@@ -80,7 +80,7 @@
   {{- range $i, $f := . }}
     {{- $list = $list | append (printf `<li id="ref-%s"><span class="ref-num">[%d]</span><span class="ref-body">%s</span></li>` (anchorize $f.key) (add $i 1) (partial "cite/format.html" $f.entry)) }}
   {{- end }}
-  {{- $html = printf "%s\n<section class=\"references\" id=\"cite-references\" aria-labelledby=\"cite-references-h\">\n<h2 id=\"cite-references-h\">References</h2>\n<ol>%s</ol>\n</section>" $html (delimit $list "\n") }}
+  {{- $html = printf "%s\n<section class=\"references\" id=\"cite-references\" aria-labelledby=\"cite-references-h\">\n<h2 id=\"cite-references-h\">%s</h2>\n<ol>%s</ol>\n</section>" $html (i18n "references") (delimit $list "\n") }}
 {{- end }}
 {{- end }}{{/* if the content has citations */}}
 {{- return ($html | safeHTML) }}

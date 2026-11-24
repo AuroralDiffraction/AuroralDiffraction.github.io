@@ -5,6 +5,7 @@ draft: true             # set to false (or delete this line) to publish
 description: ""         # one-line summary shown in lists, search and link previews
 tags: []
 html: "page.html"       # the HTML file in this folder to show; put it next to this index.md
+# original: en          # on a translation (index.zh.md): language of the original
 # height: 900           # fixed frame height in px; leave out to let the frame grow to fit the page
 ---
 

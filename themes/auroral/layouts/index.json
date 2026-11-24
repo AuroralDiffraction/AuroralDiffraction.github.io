@@ -1,5 +1,7 @@
 {{- $items := slice }}
-{{- range where site.RegularPages "Section" "in" (slice "blog" "interactive" "projects") }}
+{{- /* One index per language (/index.json, /zh/index.json). Posts that are not translated yet are
+       included from the other language, labelled with their language. */}}
+{{- range partial "i18n/pages.html" (dict "sections" (slice "blog" "interactive" "projects")) }}
 {{- $text := .Plain }}
 {{- /* Interactive posts: search the text of the embedded HTML page too. */}}
 {{- if eq .Section "interactive" }}{{ with .Resources.GetMatch (.Params.html | default "*.html") }}
@@ -9,8 +11,10 @@
 {{- $items = $items | append (dict
   "title" .Title
   "url" .RelPermalink
-  "section" (cond (eq .Section "blog") "Post" (cond (eq .Section "interactive") "Interactive" "Project"))
-  "date" (cond .Date.IsZero "" (.Date.Format "2 Jan 2006"))
+  "section" (cond (eq .Section "blog") (i18n "sectionPost") (cond (eq .Section "interactive") (i18n "sectionInteractive") (i18n "sectionProject")))
+  "lang" (cond (eq .Language.Lang site.Language.Lang) "" (.Language.LanguageCode | default .Language.Lang))
+  "langLabel" (cond (eq .Language.Lang site.Language.Lang) "" (.Site.Params.langLabel | default (upper .Language.Lang)))
+  "date" (cond .Date.IsZero "" (.Date | time.Format (site.Params.dateFormatMedium | default "2 Jan 2006")))
   "summary" (.Description | default .Summary | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 220 | htmlUnescape)
   "tags" (.Params.tags | default slice)
   "content" ($text | htmlUnescape | truncate 5000 | htmlUnescape)

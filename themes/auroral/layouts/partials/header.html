@@ -1,22 +1,30 @@
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="{{ "/" | relURL }}" aria-label="{{ site.Title }}, home">
+    <a class="brand" href="{{ site.Home.RelPermalink }}" aria-label="{{ i18n "homeLink" (dict "Title" site.Title) }}">
       {{- partial "mark.html" . }}
       <span class="brand-name">{{ site.Title }}</span>
     </a>
-    <nav class="nav" aria-label="Main">
+    <nav class="nav" aria-label="{{ i18n "mainNav" }}">
       <ul>
         {{- $current := . }}
         {{- range site.Menus.main }}
+        {{- $href := partial "i18n/url.html" .URL }}
         {{- $active := or ($current.IsMenuCurrent "main" .) ($current.HasMenuCurrent "main" .) }}
-        {{- if and (not $active) (ne .URL "/") }}{{ $active = hasPrefix $current.RelPermalink (.URL | relURL) }}{{ end }}
-        <li><a href="{{ .URL | relURL }}"{{ if $active }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+        {{- if and (not $active) (ne .URL "/") }}{{ $active = or (hasPrefix $current.RelPermalink $href) (hasPrefix $current.RelPermalink (.URL | relLangURL)) }}{{ end }}
+        <li><a href="{{ $href }}"{{ if $active }} aria-current="page"{{ end }}>{{ i18n (printf "menu.%s" .Identifier) | default .Name }}</a></li>
         {{- end }}
       </ul>
     </nav>
     <div class="header-tools">
-      <a class="icon-btn" href="{{ "/search/" | relURL }}" aria-label="Search">{{ partial "icon.html" "search" }}</a>
-      <button class="icon-btn theme-toggle" type="button" aria-label="Switch colour theme">
+      {{- /* Language switch: to this page's translation, or to the other language's home page. */}}
+      {{- $page := . }}
+      {{- range site.Sites }}{{ if ne .Language.Lang site.Language.Lang }}
+      {{- $target := .Home }}
+      {{- range first 1 (where $page.Translations "Lang" .Language.Lang) }}{{ $target = . }}{{ end }}
+      <a class="icon-btn lang-switch" href="{{ $target.RelPermalink }}" hreflang="{{ .Language.LanguageCode }}" lang="{{ .Language.LanguageCode }}" title="{{ .Language.LanguageName }}" aria-label="{{ .Language.LanguageName }}">{{ .Params.langLabel | default (upper .Language.Lang) }}</a>
+      {{- end }}{{ end }}
+      <a class="icon-btn" href="{{ partial "i18n/url.html" "/search/" }}" aria-label="{{ i18n "search" }}">{{ partial "icon.html" "search" }}</a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="{{ i18n "switchTheme" }}">
         <span class="when-dark">{{ partial "icon.html" "sun" }}</span>
         <span class="when-light">{{ partial "icon.html" "moon" }}</span>
       </button>

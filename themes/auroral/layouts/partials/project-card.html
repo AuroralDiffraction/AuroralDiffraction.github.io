@@ -10,10 +10,11 @@
   {{- end }}
   <div class="project-body">
     {{- with .Params.status }}<p class="project-status status-{{ . | urlize }}">{{ . }}</p>{{ end }}
-    <h3 class="project-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h3>
-    {{- with .Description | default .Summary }}<p class="project-summary">{{ . | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 180 }}</p>{{ end }}
+    {{- $foreign := ne .Language.Lang site.Language.Lang }}
+    <h3 class="project-title"><a href="{{ .RelPermalink }}"{{ if $foreign }} hreflang="{{ .Language.LanguageCode }}" lang="{{ .Language.LanguageCode }}"{{ end }}>{{ .Title }}</a>{{ partial "lang-badge.html" . }}{{ if .Draft }} <span class="badge">{{ i18n "badgeDraft" }}</span>{{ end }}</h3>
+    {{- with .Description | default .Summary }}<p class="project-summary"{{ if $foreign }} lang="{{ $.Language.LanguageCode }}"{{ end }}>{{ . | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 180 }}</p>{{ end }}
     {{- with .Params.tech }}
-    <ul class="chips" aria-label="Tools and technologies">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
+    <ul class="chips" aria-label="{{ i18n "toolsAndTech" }}">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
     {{- end }}
   </div>
 </article>

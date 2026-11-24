@@ -5,11 +5,11 @@
 {{- if and $show (gt (len $p.TableOfContents) 80) }}
 {{- $toc := string $p.TableOfContents }}
 {{- if strings.Contains (string .content) `id="cite-references"` }}
-  {{- $toc = replaceRE `</ul>\s*</nav>\s*$` "<li><a href=\"#cite-references\">References</a></li></ul></nav>" $toc }}
+  {{- $toc = replaceRE `</ul>\s*</nav>\s*$` (printf "<li><a href=\"#cite-references\">%s</a></li></ul></nav>" (i18n "references")) $toc }}
 {{- end }}
 <details class="toc" open>
-  <summary>Contents</summary>
+  <summary>{{ i18n "contents" }}</summary>
   {{ $toc | safeHTML }}
-  <a class="toc-top" href="#main">Back to top</a>
+  <a class="toc-top" href="#main">{{ i18n "backToTop" }}</a>
 </details>
 {{- end }}

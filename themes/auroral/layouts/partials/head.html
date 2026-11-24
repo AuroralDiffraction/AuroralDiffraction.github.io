@@ -8,6 +8,15 @@
 <meta name="description" content="{{ $desc }}">
 <meta name="author" content="{{ site.Params.author }}">
 <link rel="canonical" href="{{ .Permalink }}">
+{{- /* The same page in the other language, for search engines. */}}
+{{- if .IsTranslated }}
+{{- range .AllTranslations }}
+<link rel="alternate" hreflang="{{ .Language.LanguageCode | default .Language.Lang }}" href="{{ .Permalink }}">
+{{- end }}
+{{- range first 1 (where .AllTranslations "Lang" (index site.Sites 0).Language.Lang) }}
+<link rel="alternate" hreflang="x-default" href="{{ .Permalink }}">
+{{- end }}
+{{- end }}
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0a1022">
 
@@ -40,6 +49,7 @@
 <meta property="og:description" content="{{ $desc }}">
 <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
 <meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:locale" content="{{ replace (site.Language.LanguageCode | default site.Language.Lang) "-" "_" }}">
 {{- $img := "" }}
 {{- with .Params.cover }}{{ with .image }}{{ $img = . }}{{ end }}{{ end }}
 {{- if not $img }}{{ with site.Params.images }}{{ $img = index . 0 }}{{ end }}{{ end }}

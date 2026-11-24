@@ -7,14 +7,14 @@
     {{- with $hero.intro }}<p class="hero-intro">{{ . | markdownify }}</p>{{ end }}
     <div class="hero-actions">
       {{- range $i, $b := $hero.buttons }}
-      <a class="btn{{ if eq $i 0 }} btn-primary{{ end }}" href="{{ $b.url | relURL }}">{{ $b.name }}</a>
+      <a class="btn{{ if eq $i 0 }} btn-primary{{ end }}" href="{{ partial "i18n/url.html" $b.url }}">{{ $b.name }}</a>
       {{- end }}
     </div>
     {{- partial "social.html" . }}
   </div>
   {{- with $hero.image }}
   <figure class="hero-portrait">
-    <img src="{{ . | relURL }}" alt="Portrait of {{ site.Params.author | default site.Title }}" width="240" height="240" fetchpriority="high">
+    <img src="{{ . | relURL }}" alt="{{ i18n "portraitOf" (dict "Name" (site.Params.author | default site.Title)) }}" width="240" height="240" fetchpriority="high">
   </figure>
   {{- end }}
 </section>
@@ -23,32 +23,32 @@
 <section class="wrap home-content prose">{{ . }}</section>
 {{- end }}
 
-{{- $posts := where site.RegularPages "Section" "in" (slice "blog" "interactive") }}
+{{- $posts := partial "i18n/pages.html" (dict "sections" (slice "blog" "interactive")) }}
 <section class="wrap home-section" aria-labelledby="latest">
   <div class="section-head">
-    <h2 id="latest">Latest writing</h2>
-    {{- if $posts }}<a class="section-link" href="{{ "/blog/" | relURL }}">All posts</a>{{ end }}
+    <h2 id="latest">{{ i18n "latestWriting" }}</h2>
+    {{- if $posts }}<a class="section-link" href="{{ partial "i18n/url.html" "/blog/" }}">{{ i18n "allPosts" }}</a>{{ end }}
   </div>
-  {{- with first (site.Params.homeRecentPosts | default 5) $posts.ByDate.Reverse }}
+  {{- with first (site.Params.homeRecentPosts | default 5) (sort $posts "Date" "desc") }}
   <div class="post-list">
     {{- range . }}{{ partial "post-row.html" . }}{{ end }}
   </div>
   {{- else }}
-  <p class="empty">The first posts on hardware and chip design are on their way.</p>
+  <p class="empty">{{ i18n "homeNoPosts" }}</p>
   {{- end }}
 </section>
 
-{{- $projects := where site.RegularPages "Section" "projects" }}
+{{- $projects := partial "i18n/pages.html" (dict "sections" (slice "projects")) }}
 {{- with $projects }}
 {{- $featured := where . "Params.featured" true }}
 {{- if not $featured }}{{ $featured = . }}{{ end }}
 <section class="wrap home-section" aria-labelledby="projects-h">
   <div class="section-head">
-    <h2 id="projects-h">Selected projects</h2>
-    <a class="section-link" href="{{ "/projects/" | relURL }}">All projects</a>
+    <h2 id="projects-h">{{ i18n "selectedProjects" }}</h2>
+    <a class="section-link" href="{{ partial "i18n/url.html" "/projects/" }}">{{ i18n "allProjects" }}</a>
   </div>
   <div class="project-grid">
-    {{- range first (site.Params.homeFeaturedProjects | default 4) ($featured.ByWeight) }}{{ partial "project-card.html" . }}{{ end }}
+    {{- range first (site.Params.homeFeaturedProjects | default 4) (sort $featured "Weight") }}{{ partial "project-card.html" . }}{{ end }}
   </div>
 </section>
 {{- end }}

@@ -141,7 +141,10 @@ cover:
 ## Edit the about page and the home page
 
 - About page: `content/about.md` (Markdown).
-- Home page hero, social links and menu: `params.hero`, `params.social` and `menu` in `config.yml`.
+- Home page hero and site description: `languages.en.params` and `languages.zh.params` in `config.yml`
+  (one block per language). Social links and menu: `params.social` and `menu`; menu names are
+  translated in `themes/auroral/i18n/`.
+- Chinese About page: `content/about.zh.md` (see ADDING-POSTS.md, section 3).
 - Turn the animated background off with `params.background: false`.
 - Article width: `--post-w` at the top of `themes/auroral/assets/css/main.css` (default `58rem`).
 - Default colour theme: `params.defaultTheme` (`dark`, `light` or `auto`).
@@ -149,15 +152,18 @@ cover:
 ## Where things live
 
 ```
-config.yml                  site settings, menu, hero text, social links
+config.yml                  site settings, languages (hero text per language), menu, social links
 content/blog/               blog posts (Markdown)
 content/interactive/        interactive posts (index.md + a self-contained HTML page)
 content/projects/           projects (Markdown)
-content/about.md            about page
+content/about.md            about page (about.zh.md for Chinese)
+content/**/*.zh.md          Chinese versions of pages (same name as the English file + .zh)
 archetypes/                 templates used by `hugo new`
 static/                     files copied as-is (images, favicons)
 themes/auroral/
   layouts/                  HTML templates (layouts/interactive/ frames the HTML pages)
+  layouts/partials/i18n/    lists that mix in untranslated posts from the other language
+  i18n/en.yaml, zh.yaml     interface text (buttons, labels, messages) in each language
   assets/css/main.css       all styles; colours are CSS variables at the top
   assets/js/background.js   the animated aurora + circuit background
   assets/js/site.js         theme toggle, copy buttons, contents sidebar, citation previews

@@ -6,8 +6,11 @@
    ========================================================================== */
 
 :root {
-  --font-ui: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  /* Chinese characters aren't in the site's own fonts; they come from the reader's system fonts
+     (macOS/iOS, Windows, Linux/Android), listed after the Latin font so Latin text is unchanged. */
+  --font-cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC";
+  --font-ui: "Bricolage Grotesque", var(--font-cjk), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Source Serif 4", "Iowan Old Style", Georgia, var(--font-cjk), serif;
   --font-code: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
 
   --measure: 42rem;     /* short text: intros, search */
@@ -706,6 +709,28 @@ body:not(.is-home) .sky-veil { opacity: 1; }
 /* ---------- 404 ---------- */
 .not-found { padding-top: 6rem; }
 .nf-code { font-size: clamp(5rem, 20vw, 11rem); font-weight: 800; line-height: 1; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 1.5px var(--green); }
+
+/* ---------- Languages ---------- */
+.lang-switch { width: auto; min-width: 2.5rem; padding-inline: .55rem; font-size: .82rem; font-weight: 650; letter-spacing: .03em; text-decoration: none; }
+.badge-lang { margin-left: .4rem; background: var(--surface-2); color: var(--muted); }
+.post-row-title .badge-lang, .project-title .badge-lang { font-size: .68rem; }
+.translation-note {
+  display: flex; align-items: center; gap: .45rem;
+  margin: .9rem 0 0; padding: .45rem .8rem; width: fit-content; max-width: 100%;
+  border-radius: var(--radius-s); background: var(--surface-2); border-left: 3px solid var(--violet);
+  color: var(--ink-soft); font-size: var(--step--1);
+}
+.translation-note .icon { flex: none; width: 1rem; height: 1rem; color: var(--violet); }
+.translation-note a { color: var(--link); }
+
+/* Chinese text: no negative letter spacing (it squeezes the characters), more line height, and
+   emphasis dots instead of slanted (fake italic) characters. */
+:lang(zh) h1, :lang(zh) h2, :lang(zh) h3, :lang(zh) h4,
+:lang(zh) .post-title, :lang(zh) .page-title, :lang(zh) .post-row-title, :lang(zh) .project-title { letter-spacing: 0; }
+:lang(zh) .prose { line-height: 1.85; }
+:lang(zh) .hero-intro, :lang(zh) .post-lede, :lang(zh) .page-lede, :lang(zh) .post-row-summary { line-height: 1.75; }
+:lang(zh) .prose em:lang(zh) { font-style: normal; text-emphasis: filled dot; text-emphasis-position: under right; -webkit-text-emphasis: filled dot; -webkit-text-emphasis-position: under right; }
+:lang(zh) .prose blockquote { font-style: normal; }
 
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {

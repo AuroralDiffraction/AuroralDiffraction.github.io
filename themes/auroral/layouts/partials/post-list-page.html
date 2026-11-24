@@ -1,0 +1,25 @@
+{{- /* Body of the Blog and Interactive list pages: tag filter and posts grouped by year, including
+       posts that only exist in the other language. Context: dict "page" (the section) and "empty"
+       (message when there are no posts). */ -}}
+{{- $p := .page }}
+{{- $all := sort (partial "i18n/pages.html" (dict "sections" (slice $p.Section))) "Date" "desc" }}
+{{- with partial "i18n/terms.html" (dict "pages" $all) }}
+<nav class="tag-filter" aria-label="{{ i18n "browseByTag" }}">
+  <ul class="tags">
+    {{- range sort . "title" }}<li><a href="{{ .page.RelPermalink }}">{{ .page.LinkTitle }} <span class="count">{{ .count }}</span></a></li>{{ end }}
+  </ul>
+</nav>
+{{- end }}
+{{- $years := slice }}
+{{- range $all }}{{ $years = $years | append (.Date.Format "2006") }}{{ end }}
+{{- range $years | uniq }}
+{{- $y := . }}
+<section class="year-group" aria-labelledby="y-{{ $y }}">
+  <h2 class="year" id="y-{{ $y }}">{{ $y }}</h2>
+  <div class="post-list">
+    {{- range $all }}{{ if eq (.Date.Format "2006") $y }}{{ partial "post-row.html" . }}{{ end }}{{ end }}
+  </div>
+</section>
+{{- else }}
+<p class="empty">{{ .empty | safeHTML }}</p>
+{{- end }}

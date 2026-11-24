@@ -1,5 +1,6 @@
+{{- /* Tags of a page. Each links to the tag page in the reader's language when there is one. */ -}}
 {{- with .GetTerms "tags" }}
-<ul class="tags" aria-label="Tags">
-  {{- range . }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+<ul class="tags" aria-label="{{ i18n "tags" }}">
+  {{- range . }}{{ $t := . }}{{ with site.GetPage .Path }}{{ $t = . }}{{ end }}<li><a href="{{ $t.RelPermalink }}">{{ $t.LinkTitle }}</a></li>{{ end }}
 </ul>
 {{- end }}

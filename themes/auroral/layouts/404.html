@@ -1,7 +1,7 @@
 {{- define "main" }}
 <section class="page-header wrap not-found">
   <p class="nf-code" aria-hidden="true">404</p>
-  <h1 class="page-title">This page doesn't exist</h1>
-  <p class="page-lede">The link may be old, or the page has moved. Try the <a href="{{ "/blog/" | relURL }}">blog</a>, <a href="{{ "/projects/" | relURL }}">projects</a> or <a href="{{ "/search/" | relURL }}">search</a>.</p>
+  <h1 class="page-title">{{ i18n "notFoundTitle" }}</h1>
+  <p class="page-lede">{{ i18n "notFoundText" (dict "Blog" (partial "i18n/url.html" "/blog/") "Projects" (partial "i18n/url.html" "/projects/") "Search" (partial "i18n/url.html" "/search/")) | safeHTML }}</p>
 </section>
 {{- end }}

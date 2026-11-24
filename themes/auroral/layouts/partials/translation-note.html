@@ -1,0 +1,12 @@
+{{- /* "Originally written in English." on a translated page. Set `original: en` (or zh) in the
+       front matter of the translation; the language name links to the original when it exists.
+       Context: page. */ -}}
+{{- $orig := lower (string (.Params.original | default "")) }}
+{{- if and $orig (ne $orig .Language.Lang) }}
+  {{- $name := i18n (printf "lang.%s" $orig) | default $orig }}
+  {{- $label := $name }}
+  {{- range first 1 (where .Translations "Lang" $orig) }}
+    {{- $label = printf `<a href="%s" hreflang="%s" lang="%s">%s</a>` .RelPermalink .Language.LanguageCode .Language.LanguageCode $name }}
+  {{- end }}
+<p class="translation-note">{{ partial "icon.html" "translate" }}<span>{{ i18n "originalNote" (dict "Language" $label) | safeHTML }}</span></p>
+{{- end }}

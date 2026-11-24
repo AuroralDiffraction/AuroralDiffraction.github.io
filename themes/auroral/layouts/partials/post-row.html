@@ -1,9 +1,10 @@
-{{- /* One row in a list of posts. Context: page. */ -}}
+{{- /* One row in a list of posts. Context: page (may be in the other language if untranslated). */ -}}
+{{- $foreign := ne .Language.Lang site.Language.Lang }}
 <article class="post-row">
-  <time class="post-row-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "2 Jan" }}<span class="post-row-year">{{ .Date.Format "2006" }}</span></time>
+  <time class="post-row-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format (site.Params.dateFormatShort | default "2 Jan") }}<span class="post-row-year">{{ .Date.Format "2006" }}</span></time>
   <div class="post-row-body">
-    <h3 class="post-row-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ if eq .Section "interactive" }} <span class="badge badge-interactive">Interactive</span>{{ end }}{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h3>
-    {{- with .Description | default .Summary }}<p class="post-row-summary">{{ . | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 200 }}</p>{{ end }}
+    <h3 class="post-row-title"><a href="{{ .RelPermalink }}"{{ if $foreign }} hreflang="{{ .Language.LanguageCode }}" lang="{{ .Language.LanguageCode }}"{{ end }}>{{ .Title }}</a>{{ partial "lang-badge.html" . }}{{ if eq .Section "interactive" }} <span class="badge badge-interactive">{{ i18n "badgeInteractive" }}</span>{{ end }}{{ if .Draft }} <span class="badge">{{ i18n "badgeDraft" }}</span>{{ end }}</h3>
+    {{- with .Description | default .Summary }}<p class="post-row-summary"{{ if $foreign }} lang="{{ $.Language.LanguageCode }}"{{ end }}>{{ . | plainify | htmlUnescape | replaceRE `\s?\[@[^\[\]]+\]` "" | truncate 200 }}</p>{{ end }}
     {{- partial "tags.html" . }}
   </div>
 </article>

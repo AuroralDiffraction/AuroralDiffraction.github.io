@@ -5,6 +5,7 @@ draft: true             # set to false (or delete this line) to publish
 description: ""         # one-line summary shown in lists and link previews
 tags: []                # e.g. ["analog", "layout", "verilog"]
 toc: false              # true adds a table of contents
+# original: en          # on a translation (file.zh.md): language of the original, shows "Originally written in…"
 # references:          # sources for [@key] citations; or use data/references.json (Zotero CSL JSON)
 #   - id: smith2024
 #     type: article-journal

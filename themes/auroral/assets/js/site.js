@@ -24,7 +24,7 @@
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "copy-btn";
-    btn.setAttribute("aria-label", "Copy code");
+    btn.setAttribute("aria-label", (document.body.dataset.i18nCopy || "Copy code"));
     btn.innerHTML = copyIcon;
     btn.addEventListener("click", async () => {
       // With line numbers on, only copy the code column.
@@ -34,8 +34,8 @@
         await navigator.clipboard.writeText(text.replace(/\n$/, ""));
         btn.innerHTML = checkIcon;
         btn.classList.add("is-done");
-        btn.setAttribute("aria-label", "Copied");
-        setTimeout(() => { btn.innerHTML = copyIcon; btn.classList.remove("is-done"); btn.setAttribute("aria-label", "Copy code"); }, 1600);
+        btn.setAttribute("aria-label", (document.body.dataset.i18nCopied || "Copied"));
+        setTimeout(() => { btn.innerHTML = copyIcon; btn.classList.remove("is-done"); btn.setAttribute("aria-label", (document.body.dataset.i18nCopy || "Copy code")); }, 1600);
       } catch (e) { /* clipboard blocked: leave the button as is */ }
     });
     block.appendChild(btn);

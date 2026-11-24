@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="{{ site.Language.Lang | default "en" }}" data-theme="{{ with site.Params.defaultTheme }}{{ if eq . "light" }}light{{ else }}dark{{ end }}{{ else }}dark{{ end }}">
+<html lang="{{ site.Language.LanguageCode | default site.Language.Lang | default "en" }}" data-theme="{{ with site.Params.defaultTheme }}{{ if eq . "light" }}light{{ else }}dark{{ end }}{{ else }}dark{{ end }}">
 <head>
   {{- partial "head.html" . }}
 </head>
-<body class="kind-{{ .Kind }} section-{{ .Section | default "root" }}{{ if .IsHome }} is-home{{ end }}">
-  <a class="skip-link" href="#main">Skip to content</a>
+<body data-i18n-copy="{{ i18n "copyCode" }}" data-i18n-copied="{{ i18n "copied" }}" class="kind-{{ .Kind }} section-{{ .Section | default "root" }}{{ if .IsHome }} is-home{{ end }}">
+  <a class="skip-link" href="#main">{{ i18n "skipToContent" }}</a>
   {{- if ne site.Params.background false }}
   <canvas id="sky" class="sky" aria-hidden="true"></canvas>
   <div class="sky-veil" aria-hidden="true"></div>

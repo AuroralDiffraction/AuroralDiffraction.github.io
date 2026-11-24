@@ -1,0 +1,6 @@
+{{- /* Small label (EN / 中) on a page that is listed in the other language because it has no
+       translation yet. Context: page. Prints nothing for pages in the reader's language. */ -}}
+{{- if ne .Language.Lang site.Language.Lang }}
+{{- $name := i18n (printf "lang.%s" .Language.Lang) | default .Language.LanguageName }}
+<span class="badge badge-lang" title="{{ i18n "onlyIn" (dict "Language" $name) }}">{{ .Site.Params.langLabel | default (upper .Language.Lang) }}</span>
+{{- end }}

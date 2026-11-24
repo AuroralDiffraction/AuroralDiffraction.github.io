@@ -1,0 +1,17 @@
+{{- /* Link to a page of the site, in the reader's language when that page exists in it,
+       otherwise in the language it was written in. Context: a path such as "/blog/" or "/about/".
+       External links (http…) are returned unchanged. */ -}}
+{{- $path := . }}
+{{- $url := "" }}
+{{- if or (hasPrefix $path "http") (hasPrefix $path "mailto:") (hasPrefix $path "#") }}
+  {{- $url = $path }}
+{{- else }}
+  {{- $key := strings.TrimSuffix "/" $path | default "/" }}
+  {{- with site.GetPage $key }}
+    {{- $url = .RelPermalink }}
+  {{- else }}
+    {{- range site.Sites }}{{ if not $url }}{{ with .GetPage $key }}{{ $url = .RelPermalink }}{{ end }}{{ end }}{{ end }}
+  {{- end }}
+  {{- if not $url }}{{ $url = $path | relLangURL }}{{ end }}
+{{- end }}
+{{- return $url }}

@@ -1,0 +1,41 @@
+{{- /* Pages to list in the reader's language: this language's pages, plus pages from the other
+       language(s) that have no translation in this language (so an English-only post still shows
+       on the Chinese side, and the other way round).
+
+       Context: a dict with
+         "sections"  slice of sections to take pages from, e.g. (slice "blog" "interactive"), or
+         "term"      a taxonomy term page (e.g. /tags/analog/): pages with that term.
+         "pages"     optional: this language's pages, if the caller has them already.
+       Returns a page collection (unsorted). */ -}}
+{{- $lang := site.Language.Lang }}
+{{- $sections := .sections }}
+{{- $term := .term }}
+{{- $own := .pages }}
+{{- if not (isset . "pages") }}
+  {{- if $term }}
+    {{- /* The term page may come from the other language: use this language's page for that term. */}}
+    {{- $own = slice }}{{ with site.GetPage $term.Path }}{{ $own = .Pages }}{{ end }}
+  {{- else }}
+    {{- $own = where site.RegularPages "Section" "in" $sections }}
+  {{- end }}
+{{- end }}
+{{- $termPath := "" }}{{ $plural := "" }}
+{{- with $term }}{{ $termPath = .Path }}{{ $plural = .Data.Plural }}{{ end }}
+{{- $out := $own }}
+{{- range site.Sites }}
+  {{- if ne .Language.Lang $lang }}
+    {{- $cands := .RegularPages }}
+    {{- if $sections }}{{ $cands = where $cands "Section" "in" $sections }}{{ end }}
+    {{- range $cands }}
+      {{- if not (where .Translations "Lang" $lang) }}
+        {{- $ok := true }}
+        {{- if $termPath }}
+          {{- $ok = false }}
+          {{- range .GetTerms $plural }}{{ if eq .Path $termPath }}{{ $ok = true }}{{ end }}{{ end }}
+        {{- end }}
+        {{- if $ok }}{{ $out = $out | append . }}{{ end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- return $out }}

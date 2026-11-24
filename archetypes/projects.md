@@ -7,6 +7,7 @@ status: "In progress"   # In progress | Completed | Taped out | Archived
 featured: false         # true shows it on the home page as a wide tile
 weight: 10              # lower numbers are listed first
 tech: []                # e.g. ["Cadence Virtuoso", "Spectre", "28 nm"]
+# original: en          # on a translation (file.zh.md): language of the original
 links: []
 #  - name: GitHub
 #    url: "https://github.com/..."

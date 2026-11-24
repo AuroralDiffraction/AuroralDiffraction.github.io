@@ -1,0 +1,87 @@
+# 主题界面文字（简体中文）。每个键在 en.yaml 中都有对应的英文。
+
+# 菜单
+menu.blog: "博客"
+menu.interactive: "交互"
+menu.projects: "项目"
+menu.about: "关于"
+
+# 页眉与页脚
+skipToContent: "跳到正文"
+homeLink: "{{ .Title }}，首页"
+search: "搜索"
+switchTheme: "切换深色／浅色模式"
+mainNav: "主导航"
+readIn: "阅读{{ .Language }}版本"
+tags: "标签"
+rss: "RSS"
+builtWith: "本站使用"
+
+# 首页
+latestWriting: "最新文章"
+allPosts: "全部文章"
+selectedProjects: "精选项目"
+allProjects: "全部项目"
+homeNoPosts: "关于硬件与芯片设计的第一批文章即将发布。"
+portraitOf: "{{ .Name }} 的头像"
+
+# 列表
+browseByTag: "按标签浏览"
+taggedWith: "标签：{{ .Title }}"
+projects: "项目"
+emptyBlog: "还没有文章。在 <code>content/blog/</code> 中添加一个 Markdown 文件，它就会出现在这里。"
+emptyInteractive: "还没有交互文章。在 <code>content/interactive/</code> 中添加一个包含 <code>index.md</code> 和 HTML 页面的文件夹，它就会出现在这里。"
+emptyProjects: "项目即将上线。可以用 <code>hugo new projects/my-project.md</code> 添加。"
+emptyTags: "还没有标签。在文章的 front matter 中添加 <code>tags: [\"analog\", \"layout\"]</code>。"
+onlyIn: "仅有{{ .Language }}版本"
+
+# 徽标
+badgeInteractive: "交互"
+badgeDraft: "草稿"
+
+# 文章
+crumbBlog: "博客"
+crumbInteractive: "交互文章"
+crumbProjects: "项目"
+crumbTags: "标签"
+readingTime:
+  other: "阅读约 {{ .Count }} 分钟"
+updated: "更新于 {{ .Date }}"
+newer: "较新"
+older: "较早"
+morePosts: "更多文章"
+moreInteractive: "更多交互文章"
+contents: "目录"
+backToTop: "回到顶部"
+references: "参考文献"
+linkToSection: "链接到本节"
+toolsAndTech: "工具与技术"
+openFullPage: "在新页面打开"
+interactiveMissing: "这篇文章的交互页面缺失。"
+copyCode: "复制代码"
+copied: "已复制"
+
+# 翻译
+originalNote: "本文原文为{{ .Language }}。"
+lang.en: "英文"
+lang.zh: "中文"
+
+# 提示框
+callout.note: "注意"
+callout.tip: "提示"
+callout.warning: "警告"
+
+# 搜索
+searchLabel: "搜索文章和项目"
+sectionPost: "文章"
+sectionInteractive: "交互"
+sectionProject: "项目"
+searchLoading: "加载中…"
+searchResults:
+  other: "共 {{ .Count }} 条结果"
+searchNothing: "没有与“{q}”匹配的内容。试试更短或不同的词。"
+searchLoadError: "搜索索引加载失败，请刷新页面重试。"
+
+# 404
+notFoundTitle: "页面不存在"
+notFoundText: "链接可能已过期，或页面已移动。可以看看<a href=\"{{ .Blog }}\">博客</a>、<a href=\"{{ .Projects }}\">项目</a>，或者<a href=\"{{ .Search }}\">搜索</a>。"

@@ -1,12 +1,12 @@
 {{- define "main" }}
 {{- partial "page-header.html" . }}
 <div class="wrap">
-  {{- with .Data.Terms.ByCount }}
+  {{- with partial "i18n/terms.html" (dict "taxonomy" .Data.Plural) }}
   <ul class="tags tags-cloud">
-    {{- range . }}<li><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }} <span class="count">{{ .Count }}</span></a></li>{{ end }}
+    {{- range sort (sort . "title") "count" "desc" }}<li><a href="{{ .page.RelPermalink }}">{{ .page.LinkTitle }} <span class="count">{{ .count }}</span></a></li>{{ end }}
   </ul>
   {{- else }}
-  <p class="empty">No tags yet. Add <code>tags: ["analog", "layout"]</code> to a post's front matter.</p>
+  <p class="empty">{{ i18n "emptyTags" | safeHTML }}</p>
   {{- end }}
 </div>
 {{- end }}

@@ -4,21 +4,22 @@
 <article class="post{{ if $toc }} has-toc{{ end }}">
   <div class="post-grid">
     <header class="post-header">
-      <p class="crumbs"><a href="{{ "/blog/" | relURL }}">Blog</a></p>
-      <h1 class="post-title">{{ .Title }}{{ if .Draft }} <span class="badge">Draft</span>{{ end }}</h1>
+      <p class="crumbs"><a href="{{ partial "i18n/url.html" "/blog/" }}">{{ i18n "crumbBlog" }}</a></p>
+      <h1 class="post-title">{{ .Title }}{{ if .Draft }} <span class="badge">{{ i18n "badgeDraft" }}</span>{{ end }}</h1>
       {{- with .Description }}<p class="post-lede">{{ . | markdownify }}</p>{{ end }}
       {{- partial "post-meta.html" . }}
+      {{- partial "translation-note.html" . }}
       {{- partial "tags.html" . }}
     </header>
     {{- partial "cover.html" . }}
-    {{- with $toc }}<aside class="post-toc" aria-label="Contents">{{ . | safeHTML }}</aside>{{ end }}
+    {{- with $toc }}<aside class="post-toc" aria-label="{{ i18n "contents" }}">{{ . | safeHTML }}</aside>{{ end }}
     <div class="post-body prose">
       {{ $content }}
     </div>
     <footer class="post-footer">
-      <nav class="post-nav" aria-label="More posts">
-        {{- with .PrevInSection }}<a class="post-nav-link prev" href="{{ .RelPermalink }}"><span class="post-nav-dir">Newer</span><span class="post-nav-title">{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
-        {{- with .NextInSection }}<a class="post-nav-link next" href="{{ .RelPermalink }}"><span class="post-nav-dir">Older</span><span class="post-nav-title">{{ .Title }}</span></a>{{ end }}
+      <nav class="post-nav" aria-label="{{ i18n "morePosts" }}">
+        {{- with .PrevInSection }}<a class="post-nav-link prev" href="{{ .RelPermalink }}"><span class="post-nav-dir">{{ i18n "newer" }}</span><span class="post-nav-title">{{ .Title }}</span></a>{{ else }}<span></span>{{ end }}
+        {{- with .NextInSection }}<a class="post-nav-link next" href="{{ .RelPermalink }}"><span class="post-nav-dir">{{ i18n "older" }}</span><span class="post-nav-title">{{ .Title }}</span></a>{{ end }}
       </nav>
     </footer>
   </div>

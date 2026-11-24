@@ -2,12 +2,12 @@
 {{- partial "page-header.html" . }}
 <div class="wrap">
   {{- with .Content }}<div class="prose list-intro">{{ . }}</div>{{ end }}
-  {{- with .RegularPages }}
+  {{- with partial "i18n/pages.html" (dict "sections" (slice .Section)) }}
   <div class="project-grid">
-    {{- range .ByWeight }}{{ partial "project-card.html" . }}{{ end }}
+    {{- range sort . "Weight" }}{{ partial "project-card.html" . }}{{ end }}
   </div>
   {{- else }}
-  <p class="empty">Projects are on their way. Add one with <code>hugo new projects/my-project.md</code>.</p>
+  <p class="empty">{{ i18n "emptyProjects" | safeHTML }}</p>
   {{- end }}
 </div>
 {{- end }}

@@ -10,6 +10,9 @@ The site has two places for writing:
 Both show up under *Latest writing* on the home page, in search, in the tag pages and in the RSS feed.
 Interactive posts get a small violet **Interactive** label in lists.
 
+Every post can also have a Chinese version (or be written in Chinese only), see
+[Writing in two languages](#3-writing-in-two-languages).
+
 You don't need anything except a text editor and Git to publish. Every push to `main` builds the
 site on GitHub and publishes it within a minute or two. Installing Hugo is optional, but it lets you
 preview a post before anyone else sees it (see [Preview on your computer](#preview-on-your-computer)).
@@ -89,6 +92,7 @@ boxes, spec tables and numbered citations with a reference list. `README.md` has
 | `math` | no | `true` forces KaTeX on (it is normally detected automatically) |
 | `cover` | no | `image`, `alt`, `caption` for a picture at the top and in link previews |
 | `references` | no | Sources for `[@key]` citations (see README) |
+| `original` | no | On a translation: the language the post was first written in (`en` or `zh`). Shows “Originally written in …” with a link. See [section 3](#3-writing-in-two-languages). |
 
 ---
 
@@ -200,6 +204,112 @@ no entry in any list. To have an HTML page listed and framed in the site, use th
 
 ---
 
+## 3. Writing in two languages
+
+The site has an English side and a Chinese (简体中文) side:
+
+| Language | Addresses | Interface |
+|---|---|---|
+| English | `/`, `/blog/…`, `/interactive/…` (unchanged) | English |
+| 简体中文 | `/zh/`, `/zh/blog/…`, `/zh/interactive/…` | Chinese |
+
+The **EN / 中** button in the header switches language. On a post that has a translation it opens
+the translation; otherwise it opens the other language's home page.
+
+### The rule: same file name, with `.zh` before `.md`
+
+A translation sits next to the original and has the same name with `.zh` added. Hugo pairs the two
+files by name, so nothing else needs linking:
+
+| You want | Files |
+|---|---|
+| English only (as before) | `content/blog/designing-a-bandgap.md` |
+| English and Chinese | `content/blog/designing-a-bandgap.md` + `content/blog/designing-a-bandgap.zh.md` |
+| Chinese only | `content/blog/designing-a-bandgap.zh.md` |
+| Post with images | `content/blog/my-first-chip/index.md` + `index.zh.md` in the same folder. The images are shared, so add them once. |
+
+Both versions use the same URL name: `/blog/designing-a-bandgap/` and `/zh/blog/designing-a-bandgap/`.
+
+A Chinese post uses the same front matter, written in Chinese. **Keep the tags in English** (the
+same tags as the English version), so both languages share one set of tag pages:
+
+```markdown
+---
+title: "带隙基准源设计"
+date: 2026-11-01
+description: "列表、搜索和链接预览中显示的一句话摘要。"
+tags: ["analog", "references"]
+original: en
+---
+
+带隙基准源把随温度下降的电压与随温度上升的电压相加……
+```
+
+### Marking a translation: `original`
+
+On a translated post, set `original:` to the language the post was first written in (`en` or
+`zh`). The translation then shows a small note under the date:
+
+- English page translated from Chinese: *Originally written in **Chinese**.*
+- Chinese page translated from English: *本文原文为**英文**。*
+
+The language name links to the original post. Leave `original` out on the original itself (or set it
+to the page's own language, which shows nothing). It works on blog posts, interactive posts,
+projects and the About page.
+
+### Posts that only exist in one language
+
+You don't have to translate everything. A post with no translation still shows on the other side,
+in the home page, the Blog/Interactive/Projects lists, the tag pages and search, with a small
+**EN** or **中** label. Clicking it opens the post in its own language. As soon as you add the
+translation, the label disappears and each side shows its own version.
+
+The RSS feeds are per language (`/index.xml` and `/zh/index.xml`) and only contain posts written or
+translated into that language.
+
+### Interactive posts in two languages
+
+Add `index.zh.md` next to `index.md` in the post's folder. Then either:
+
+- **reuse the English page:** `html: "page.html"` in `index.zh.md` (the interactive page stays in
+  English, the title, description and notes around it are Chinese), or
+- **use a translated page:** save it next to the original as `page.zh.html` and put
+  `html: "page.zh.html"` in `index.zh.md`.
+
+```
+content/interactive/gm-id-method/
+├── index.md        ← html: "page.html"
+├── index.zh.md     ← html: "page.zh.html", original: en
+├── page.html
+└── page.zh.html    ← optional translated page
+```
+
+If you translate the HTML page itself, also change `<html lang="en">` to `<html lang="zh-CN">` at
+its top, so browsers pick Chinese fonts and line breaking.
+
+### Section pages, About and Search
+
+Each section has a Chinese title and description in `content/blog/_index.zh.md`,
+`content/interactive/_index.zh.md` and `content/projects/_index.zh.md`. The Chinese search page
+is `content/search.zh.md`. For a Chinese About page, add `content/about.zh.md` (same front matter as
+`about.md`, with `layout: about`). Until it exists, the 关于 menu item opens the English page.
+
+### Where the rest of the Chinese text lives
+
+| What | Where |
+|---|---|
+| Home page text (subtitle, intro, buttons), site description, date format | `languages.zh.params` in `config.yml` (English: `languages.en.params`) |
+| Interface words: menu, “Latest writing”, “min read”, search messages… | `themes/auroral/i18n/zh.yaml` (English: `en.yaml`) |
+
+### Translating with AI
+
+Copy the original file to the `.zh.md` (or plain `.md`) name, translate the title, description
+and body, keep `date`, `tags`, `html`, image names, code and maths unchanged, and add `original:`.
+Read it through once before publishing: AI translations often slip on technical terms
+(e.g. 跨导 for transconductance, 反型 for inversion).
+
+---
+
 ## Preview on your computer
 
 Install Hugo once. On Windows, in PowerShell:
@@ -241,3 +351,6 @@ the log under *Build* names the file and line that caused it.
 | Interactive page keeps growing or is cut off | Add `height: 800` (or a value that suits it) to `index.md` |
 | Interactive page ignores the site's dark/light switch | Its CSS doesn't style `:root[data-theme="dark"]`. Optional, see above |
 | A tag links to a strange address | The tag contains `/`. Use words and spaces only. |
+| A translation shows up as a separate post with an **EN**/**中** label | The file names don't match: it must be exactly the original's name plus `.zh` (`bandgap.zh.md` next to `bandgap.md`, `index.zh.md` next to `index.md`) |
+| “Originally written in …” has no link | The original isn't published (still a draft, future date) or `original:` names the wrong language |
+| Chinese post shows `Analog` and `模拟` as two different tags | Tags were translated. Use the English tags in both versions. |

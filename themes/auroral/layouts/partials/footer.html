@@ -1,10 +1,10 @@
 <footer class="site-footer">
   <div class="wrap footer-inner">
-    <p>&copy; {{ now.Year }} {{ site.Title }}. Built with <a href="https://gohugo.io/">Hugo</a>.</p>
+    <p>&copy; {{ now.Year }} {{ site.Title }}. {{ i18n "builtWith" }} <a href="https://gohugo.io/">Hugo</a>.</p>
     <div class="footer-links">
-      <a href="{{ "/tags/" | relURL }}">Tags</a>
-      <a href="{{ "/search/" | relURL }}">Search</a>
-      <a href="{{ "/index.xml" | relURL }}">RSS</a>
+      <a href="{{ partial "i18n/url.html" "/tags/" }}">{{ i18n "tags" }}</a>
+      <a href="{{ partial "i18n/url.html" "/search/" }}">{{ i18n "search" }}</a>
+      <a href="{{ "index.xml" | relLangURL }}">{{ i18n "rss" }}</a>
     </div>
   </div>
 </footer>

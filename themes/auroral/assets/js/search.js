@@ -6,6 +6,8 @@
   if (!input || !out) return;
 
   let index = null;
+  // Messages come from the page (data-i18n-* on the input), so they follow the site language.
+  const t = (key, fallback) => input.dataset["i18n" + key] || fallback;
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const norm = (s) => String(s || "").toLowerCase();
 
@@ -48,15 +50,17 @@
     if (q) params.set("q", q); else params.delete("q");
     history.replaceState(null, "", location.pathname + (params.toString() ? "?" + params : ""));
     if (!q) { out.innerHTML = ""; status.textContent = ""; return; }
-    if (!index) { status.textContent = "Loading…"; return; }
+    if (!index) { status.textContent = t("Loading", "Loading…"); return; }
     const terms = norm(q).split(/\s+/).filter(Boolean);
     const results = index.map((item) => ({ item, s: score(item, terms) })).filter((r) => r.s > 0).sort((a, b) => b.s - a.s);
-    status.textContent = results.length ? `${results.length} result${results.length === 1 ? "" : "s"}` : `Nothing matches “${q}”. Try a shorter or different word.`;
+    status.textContent = results.length
+      ? (results.length === 1 ? t("One", "1 result") : t("Many", "2 results").replace(/\d+/, results.length))
+      : t("Nothing", "Nothing matches “{q}”. Try a shorter or different word.").replace("{q}", q);
     out.innerHTML = results.slice(0, 30).map(({ item }) => `
       <article class="post-row">
         <span class="post-row-date">${esc(item.section)}<span class="post-row-year">${esc(item.date || "")}</span></span>
         <div class="post-row-body">
-          <h3 class="post-row-title"><a href="${esc(item.url)}">${highlight(item.title, terms)}</a></h3>
+          <h3 class="post-row-title"><a href="${esc(item.url)}"${item.lang ? ` lang="${esc(item.lang)}"` : ""}>${highlight(item.title, terms)}</a>${item.langLabel ? ` <span class="badge badge-lang">${esc(item.langLabel)}</span>` : ""}</h3>
           <p class="post-row-summary">${highlight(snippet(item, terms), terms)}</p>
         </div>
       </article>`).join("");
@@ -65,7 +69,7 @@
   fetch(input.dataset.index)
     .then((r) => r.json())
     .then((data) => { index = data; run(); })
-    .catch(() => { status.textContent = "Search couldn't load its index. Reload the page to try again."; });
+    .catch(() => { status.textContent = t("Error", "Search couldn't load its index. Reload the page to try again."); });
 
   const initial = new URLSearchParams(location.search).get("q");
   if (initial) input.value = initial;
